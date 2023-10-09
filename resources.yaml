@@ -48,7 +48,7 @@ spec:
             - name: listen_address
               value: 0.0.0.0
             - name: grpc_port
-              value: 4388
+              value: 4389
             - name: http_port
               value: 4318
             - name: enable_tls
