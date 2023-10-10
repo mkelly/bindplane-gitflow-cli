@@ -43,7 +43,8 @@ spec:
     contentType: ""
     measurementInterval: ""
     sources:
-        - type: otlp
+        - id: 01HCDADJGYVQ6CPKY6M3WHEASN
+          type: otlp
           parameters:
             - name: listen_address
               value: 0.0.0.0
