@@ -71,7 +71,8 @@ spec:
             - name: grpc_max_connection_age_grace
               value: 300
     destinations:
-        - name: nr-otlp
+        - id: 01HBY3GA7T8FQ70GQ6KA0RC5R9
+          name: nr-otlp
     selector:
         matchLabels:
             configuration: test
