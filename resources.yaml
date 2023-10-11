@@ -2,6 +2,7 @@ apiVersion: bindplane.observiq.com/v1
 kind: Destination
 metadata:
     name: nr-otlp
+    id: 01HBY3GA7T8FQ70GQ6KA0RC5R9
 spec:
     type: newrelic_otlp
     parameters:
