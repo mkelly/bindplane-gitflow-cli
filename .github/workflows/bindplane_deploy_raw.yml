@@ -27,10 +27,10 @@ jobs:
 
       - name: Create Profile
         run: |
-          bindplane profile set gitflow \
+          bindplane profile set mk \
             --remote-url https://app.bindplane.com \
             --api-key ${{ secrets.BINDPLANE_API_KEY }}
-          bindplane profile use gitflow
+          bindplane profile use mk
 
       - name: Test CLI
         run: bindplane version
