@@ -1,5 +1,6 @@
-name: BindPlane OP Deploy
+name: BindPlane OP Deploy Raw
 on:
+  workflow_dispatch:
   push:
     branches:
       - main
