@@ -35,5 +35,12 @@ jobs:
       - name: Test CLI
         run: bindplane version
 
-      - name: Deploy Resources
-        run: bindplane apply -f resources.yaml
+      - name: Install yq
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y snapd
+          sudo snap install yq
+
+      - name: Run merge script
+        run: |
+          bash ./merge_yaml.sh
