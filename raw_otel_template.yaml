@@ -1,0 +1,15 @@
+apiVersion: bindplane.observiq.com/v1
+kind: Configuration
+metadata:
+    id: 01HCDWAQ5J7Q92G06P41FMEWCB
+    name: <NAME_OF_FILE>
+    labels:
+        platform: linux
+spec:
+    contentType: ""
+    measurementInterval: ""
+    raw: |
+         <MY_OTEL_FILE>
+    selector:
+      matchLabels:
+          configuration: raw-config
