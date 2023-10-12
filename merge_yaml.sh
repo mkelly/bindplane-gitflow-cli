@@ -25,14 +25,11 @@ for CONFIG_FILE in $SOURCE_DIR/*.yaml; do
         # Extract the content of CONFIG_FILE into a variable
         otel_content=$(<$CONFIG_FILE)
 
-        # Export the variable to make it accessible for yq
-        export otel_content
-
         # Define output file name
         OUTPUT_FILE="$OUTPUT_DIR/merged_$name_without_extension.yaml"
 
-        # Inject the content from CONFIG_FILE into TEMPLATE_FILE and save to OUTPUT_FILE
-        yq eval '.spec.raw = env(otel_content) | .metadata.name = env(name_without_extension)' $TEMPLATE_FILE > $OUTPUT_FILE
+        # Set environment variables and immediately use them within yq
+        OTEL_CONTENT="$otel_content" NAME_WITHOUT_EXTENSION="$name_without_extension" yq eval '.spec.raw = env(OTEL_CONTENT) | .metadata.name = env(NAME_WITHOUT_EXTENSION)' $TEMPLATE_FILE > $OUTPUT_FILE
     fi
 done
 
