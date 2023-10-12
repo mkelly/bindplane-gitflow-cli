@@ -47,3 +47,9 @@ jobs:
       
       - name: List output directory contents
         run: ls -R ./output/
+
+      - name: Deploy Resources using Bindplane CLI
+        run: |
+          for file in output/*.yaml; do
+            bindplane apply -f $file
+          done
