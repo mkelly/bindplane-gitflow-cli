@@ -29,7 +29,7 @@ for CONFIG_FILE in $SOURCE_DIR/*.yaml; do
         OUTPUT_FILE="$OUTPUT_DIR/merged_$name_without_extension.yaml"
 
         # Set environment variables and immediately use them within yq
-        OTEL_CONTENT="$otel_content" NAME_WITHOUT_EXTENSION="$name_without_extension" yq eval '.spec.raw = env(OTEL_CONTENT) | .metadata.name = env(NAME_WITHOUT_EXTENSION)' $TEMPLATE_FILE > $OUTPUT_FILE
+        OTEL_CONTENT="$otel_content" NAME_WITHOUT_EXTENSION="$name_without_extension" yq eval '.spec.raw = env(OTEL_CONTENT) | .metadata.name = env(NAME_WITHOUT_EXTENSION) | .spec.matchLabels.configuration = env(NAME_WITHOUT_EXTENSION)' $TEMPLATE_FILE > $OUTPUT_FILE
     fi
 done
 
