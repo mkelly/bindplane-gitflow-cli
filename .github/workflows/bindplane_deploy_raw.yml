@@ -44,3 +44,6 @@ jobs:
       - name: Run merge script
         run: |
           bash ./merge_yaml.sh
+      
+      - name: List output directory contents
+        run: ls -R ./output/
