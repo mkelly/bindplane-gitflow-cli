@@ -1,6 +1,5 @@
-name: BindPlane OP Deploy Raw
+name: BindPlane OP Deploy and Export Raw
 on:
-  workflow_dispatch:
   push:
     branches:
       - main
@@ -27,34 +26,24 @@ jobs:
 
       - name: Create Profile
         run: |
-          bindplane profile set mk \
+          bindplane profile set gitflow \
             --remote-url https://app.bindplane.com \
             --api-key ${{ secrets.BINDPLANE_API_KEY }}
-          bindplane profile use mk
+          bindplane profile use gitflow
 
       - name: Test CLI
         run: bindplane version
 
-      - name: Install yq
-        run: |
-          sudo apt-get update
-          sudo apt-get install -y snapd
-          sudo snap install yq
+      - name: Deploy Resources
+        run: bash ./apply_bindplane_configs.sh
 
-      - name: Run merge script
-        run: |
-          bash ./merge_yaml.sh
-      
-      - name: List output directory contents
-        run: ls -R ./output/
+      - name: Export and checkin otel
+        run: bash ./get_bindplane_otel_configs.sh
 
-      - name: Deploy Resources using Bindplane CLI
+      - name: Commit and Push Changes
         run: |
-          for file in output/*.yaml; do
-            bindplane apply -f $file
-          done
-
-      - name: Get Raw OTEL using Bindplane CLI
-        run: |
-          bash ./get_bindplane_config.sh
-          
+          git config --global user.email "github-actions[bot]@users.noreply.github.com"
+          git config --global user.name "github-actions[bot]"
+          git add -A
+          git commit -m "Automated changes"
+          git push
