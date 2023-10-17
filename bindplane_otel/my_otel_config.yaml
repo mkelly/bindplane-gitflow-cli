@@ -1,0 +1,22 @@
+receivers:
+  hostmetrics:
+    collection_interval: 1m
+    scrapers:
+      load:
+      filesystem:
+      memory:
+      network:
+
+processors:
+  batch:
+
+exporters:
+  logging:
+    loglevel: warn
+
+service:
+  pipelines:
+    metrics:
+      receivers: [hostmetrics]
+      processors: [batch]
+      exporters: [logging]
