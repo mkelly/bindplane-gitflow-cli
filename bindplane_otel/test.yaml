@@ -1,53 +1,163 @@
 # This configuration is managed by BindPlane OP.
 # Configuration: test:1
 receivers:
-    otlp/source0_01HCDADJGYVQ6CPKY6M3WHEASN:
-        protocols:
-            grpc:
-                endpoint: 0.0.0.0:4392
-                keepalive:
-                    server_parameters:
-                        max_connection_age: 60s
-                        max_connection_age_grace: 300s
-                        max_connection_idle: 60s
-                        time: 2h
-                        timeout: 20s
-            http:
-                endpoint: 0.0.0.0:4318
-processors:
-    batch/nr-otlp: null
-exporters:
-    otlp/nr-otlp:
-        compression: gzip
-        endpoint: https://otlp.nr-data.net:443
-        headers:
-            - api-key: (sensitive)
+    filelog/source2_01HCT8ZS9BV1FT593TDV8SV5H4:
+        encoding: utf-8
+        fingerprint_size: 1kb
+        include:
+            - /Users/michaelkelly/fake-logs/apache.log
+        include_file_name: true
+        include_file_name_resolved: false
+        include_file_path: false
+        include_file_path_resolved: false
+        max_concurrent_files: 1024
+        operators:
+            - field: attributes.log_type
+              type: add
+              value: file
+        poll_interval: 200ms
         retry_on_failure:
             enabled: false
+        start_at: end
+        storage: file_storage/source2_01HCT8ZS9BV1FT593TDV8SV5H4
+    hostmetrics/source0_01HCQH5V011SZTB6Q3G3JZGCPY:
+        collection_interval: 60s
+        scrapers:
+            filesystem: null
+            load: null
+            memory: null
+            network: null
+            paging: null
+    plugin/source0_01HCQH5V011SZTB6Q3G3JZGCPY__macos:
+        parameters:
+            enable_install_log: true
+            enable_system_log: true
+            install_log_path:
+                - /var/log/install.log
+            start_at: end
+            system_log_path:
+                - /var/log/system.log
+        path: $OIQ_OTEL_COLLECTOR_HOME/plugins/macos_logs.yaml
+    plugin/source1_01HCQH5V011SZTB6Q3G5G691RD__postgresql:
+        parameters:
+            postgresql_log_path:
+                - /var/log/postgresql/postgresql*.log
+                - /var/lib/pgsql/data/log/postgresql*.log
+                - /var/lib/pgsql/*/data/log/postgresql*.log
+            start_at: end
+        path: $OIQ_OTEL_COLLECTOR_HOME/plugins/postgresql_logs.yaml
+processors:
+    batch/splunk-north: null
+    resourcedetection/source0_01HCQH5V011SZTB6Q3G3JZGCPY:
+        detectors:
+            - system
+        system:
+            hostname_sources:
+                - os
+    resourcedetection/source1_01HCQH5V011SZTB6Q3G5G691RD:
+        detectors:
+            - system
+        system:
+            hostname_sources:
+                - os
+    resourcedetection/source2_01HCT8ZS9BV1FT593TDV8SV5H4:
+        detectors:
+            - system
+        system:
+            hostname_sources:
+                - os
+exporters:
+    awss3/us-east1:
+        s3uploader:
+            region: us-east-1
+            s3_bucket: asdfasdfa
+            s3_partition: minute
+            s3_prefix: null
+    splunk_hec/splunk-north:
+        disable_compression: false
+        endpoint: http://localhost:8088/services/collector/event
+        max_content_length_logs: 2097152
+        max_content_length_metrics: 2097152
+        max_content_length_traces: 2097152
+        max_event_size: 2097152
+        retry_on_failure:
+            enabled: true
+            initial_interval: 5s
+            max_elapsed_time: 300s
+            max_interval: 30s
         sending_queue:
-            enabled: false
+            enabled: true
+            num_consumers: 10
+            queue_size: 5000
+            storage: file_storage/splunk-north
         tls:
-            insecure: false
+            insecure: true
+        token: asdfasdfasdfasdfasdf
+extensions:
+    file_storage/source2_01HCT8ZS9BV1FT593TDV8SV5H4:
+        compaction:
+            directory: $OIQ_OTEL_COLLECTOR_HOME/storage
+            on_rebound: true
+        directory: $OIQ_OTEL_COLLECTOR_HOME/storage
+    file_storage/splunk-north:
+        compaction:
+            directory: $OIQ_OTEL_COLLECTOR_HOME/storage
+            on_rebound: true
+        directory: $OIQ_OTEL_COLLECTOR_HOME/storage
 service:
+    extensions:
+        - file_storage/splunk-north
+        - file_storage/source2_01HCT8ZS9BV1FT593TDV8SV5H4
     pipelines:
-        logs/source0_01HCDADJGYVQ6CPKY6M3WHEASN__nr-otlp-0:
+        logs/source0_01HCQH5V011SZTB6Q3G3JZGCPY__splunk-north-1:
             receivers:
-                - otlp/source0_01HCDADJGYVQ6CPKY6M3WHEASN
+                - plugin/source0_01HCQH5V011SZTB6Q3G3JZGCPY__macos
             processors:
-                - batch/nr-otlp
+                - resourcedetection/source0_01HCQH5V011SZTB6Q3G3JZGCPY
+                - batch/splunk-north
             exporters:
-                - otlp/nr-otlp
-        metrics/source0_01HCDADJGYVQ6CPKY6M3WHEASN__nr-otlp-0:
+                - splunk_hec/splunk-north
+        logs/source0_01HCQH5V011SZTB6Q3G3JZGCPY__us-east1-0:
             receivers:
-                - otlp/source0_01HCDADJGYVQ6CPKY6M3WHEASN
+                - plugin/source0_01HCQH5V011SZTB6Q3G3JZGCPY__macos
             processors:
-                - batch/nr-otlp
+                - resourcedetection/source0_01HCQH5V011SZTB6Q3G3JZGCPY
             exporters:
-                - otlp/nr-otlp
-        traces/source0_01HCDADJGYVQ6CPKY6M3WHEASN__nr-otlp-0:
+                - awss3/us-east1
+        logs/source1_01HCQH5V011SZTB6Q3G5G691RD__splunk-north-1:
             receivers:
-                - otlp/source0_01HCDADJGYVQ6CPKY6M3WHEASN
+                - plugin/source1_01HCQH5V011SZTB6Q3G5G691RD__postgresql
             processors:
-                - batch/nr-otlp
+                - resourcedetection/source1_01HCQH5V011SZTB6Q3G5G691RD
+                - batch/splunk-north
             exporters:
-                - otlp/nr-otlp
+                - splunk_hec/splunk-north
+        logs/source1_01HCQH5V011SZTB6Q3G5G691RD__us-east1-0:
+            receivers:
+                - plugin/source1_01HCQH5V011SZTB6Q3G5G691RD__postgresql
+            processors:
+                - resourcedetection/source1_01HCQH5V011SZTB6Q3G5G691RD
+            exporters:
+                - awss3/us-east1
+        logs/source2_01HCT8ZS9BV1FT593TDV8SV5H4__splunk-north-1:
+            receivers:
+                - filelog/source2_01HCT8ZS9BV1FT593TDV8SV5H4
+            processors:
+                - resourcedetection/source2_01HCT8ZS9BV1FT593TDV8SV5H4
+                - batch/splunk-north
+            exporters:
+                - splunk_hec/splunk-north
+        logs/source2_01HCT8ZS9BV1FT593TDV8SV5H4__us-east1-0:
+            receivers:
+                - filelog/source2_01HCT8ZS9BV1FT593TDV8SV5H4
+            processors:
+                - resourcedetection/source2_01HCT8ZS9BV1FT593TDV8SV5H4
+            exporters:
+                - awss3/us-east1
+        metrics/source0_01HCQH5V011SZTB6Q3G3JZGCPY__us-east1-0:
+            receivers:
+                - hostmetrics/source0_01HCQH5V011SZTB6Q3G3JZGCPY
+            processors:
+                - resourcedetection/source0_01HCQH5V011SZTB6Q3G3JZGCPY
+            exporters:
+                - awss3/us-east1
