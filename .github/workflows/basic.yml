@@ -35,4 +35,6 @@ jobs:
         run: bindplane version
 
       - name: Deploy Resources
-        run: bindplane apply -f gitops_workflow_basic/resources.yaml
+        run: |
+          cd gitops_workflow_basic
+          bindplane apply -f resources.yaml

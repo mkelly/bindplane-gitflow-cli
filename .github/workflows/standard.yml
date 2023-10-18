@@ -35,10 +35,14 @@ jobs:
         run: bindplane version
 
       - name: Deploy Resources
-        run: bash ./gitops_workflow_standard/apply_bindplane_configs.sh
+        run: |
+          cd gitops_workflow_standard
+          bash ./apply_bindplane_configs.sh
 
       - name: Export and checkin otel
-        run: bash ./gitops_workflow_standard/get_bindplane_otel_configs.sh
+        run: |
+          cd gitops_workflow_standard
+          bash ./get_bindplane_otel_configs.sh
 
       - name: Commit and Push Changes
         run: |
