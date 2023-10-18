@@ -43,7 +43,7 @@ jobs:
 
       - name: Run merge script
         run: |
-          bash ./gitops_workflow_raw_otel/merge_yaml.sh
+          bash (cd ./gitops_workflow_raw_otel && ./merge_yaml.sh)
       
       - name: List output directory contents
         run: ls -R ./gitops_workflow_raw_otel/output/
