@@ -1,5 +1,6 @@
-name: BindPlane OP Deploy
+name: BindPlane OP Deploy Raw
 on:
+  workflow_dispatch:
   push:
     branches:
       - main
@@ -34,5 +35,22 @@ jobs:
       - name: Test CLI
         run: bindplane version
 
-      - name: Deploy Resources
-        run: bindplane apply -f resources.yaml
+      - name: Install yq
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y snapd
+          sudo snap install yq
+
+      - name: Run merge script
+        run: |
+          bash ./gitops_workflow_raw_otel/merge_yaml.sh
+      
+      - name: List output directory contents
+        run: ls -R ./gitops_workflow_raw_otel/output/
+
+      - name: Deploy Resources using Bindplane CLI
+        run: |
+          for file in gitops_workflow_raw_otel/output/*.yaml; do
+            bindplane apply -f $file
+          done
+          

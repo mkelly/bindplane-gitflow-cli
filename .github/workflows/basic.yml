@@ -1,4 +1,4 @@
-name: BindPlane OP Deploy and Export Raw
+name: BindPlane OP Deploy
 on:
   push:
     branches:
@@ -35,15 +35,4 @@ jobs:
         run: bindplane version
 
       - name: Deploy Resources
-        run: bash ./apply_bindplane_configs.sh
-
-      - name: Export and checkin otel
-        run: bash ./get_bindplane_otel_configs.sh
-
-      - name: Commit and Push Changes
-        run: |
-          git config --global user.email "github-actions[bot]@users.noreply.github.com"
-          git config --global user.name "github-actions[bot]"
-          git add bindplane_otel/
-          git commit -m "Automated changes"
-          git push
+        run: bindplane apply -f gitops_workflow_basic/resources.yaml

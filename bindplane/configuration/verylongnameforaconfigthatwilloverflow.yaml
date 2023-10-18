@@ -1,0 +1,60 @@
+apiVersion: bindplane.observiq.com/v1
+kind: Configuration
+metadata:
+    id: verylongnameforaconfigthatwilloverflow
+    name: verylongnameforaconfigthatwilloverflow
+    labels:
+        platform: macos
+    hash: c8a9fb4023a8cf6b4f03781e71279515c2de492a2813a0b9432a91b2d64df12b
+    version: 1
+    dateModified: 2023-10-15T20:17:39.567908-04:00
+spec:
+    contentType: ""
+    measurementInterval: ""
+    sources:
+        - id: 01HCTXG5ZNDT8325WNMW776Q7N
+          type: aerospike:1
+          parameters:
+            - name: enable_metrics
+              value: false
+            - name: hostname
+              value: localhost
+            - name: port
+              value: 3000
+            - name: collection_interval
+              value: 60
+            - name: collect_cluster_metrics
+              value: false
+            - name: aerospike_enterprise
+              value: false
+            - name: username
+              value: ""
+            - name: password
+              value: (sensitive)
+              sensitive: true
+            - name: enable_tls
+              value: false
+            - name: insecure_skip_verify
+              value: false
+            - name: server_name
+              value: ""
+            - name: ca_file
+              value: ""
+            - name: cert_file
+              value: ""
+            - name: key_file
+              value: ""
+            - name: disable_metrics
+              value: []
+            - name: enable_logs
+              value: true
+            - name: start_at
+              value: end
+    destinations:
+        - id: 01HCTXGWQFDRD4MDGEQBJ65J58
+          name: grafana-cloud-west:1
+    selector:
+        matchLabels:
+            configuration: verylongnameforaconfigthatwilloverflow
+status:
+    latest: true

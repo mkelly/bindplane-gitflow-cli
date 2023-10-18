@@ -1,0 +1,68 @@
+apiVersion: bindplane.observiq.com/v1
+kind: Destination
+metadata:
+    id: elastic-cluster-1
+    name: elastic-cluster-1
+    hash: 2d08d5f568151e2da9618f48e2e92bd026bd01c30cdeef85e9de26416cbe32ff
+    version: 1
+    dateModified: 2023-10-14T13:02:54.586783-04:00
+spec:
+    type: elasticsearch:1
+    parameters:
+        - name: enable_elastic_cloud
+          value: false
+        - name: endpoints
+          value:
+            - asdfasdf
+        - name: cloudid
+          value: ""
+        - name: enable_logs
+          value: true
+        - name: logs_index
+          value: logs-generic-default
+        - name: enable_traces
+          value: true
+        - name: traces_index
+          value: traces-generic-default
+        - name: pipeline
+          value: ""
+        - name: enable_auth
+          value: false
+        - name: auth_type
+          value: basic
+        - name: user
+          value: ""
+        - name: password
+          value: (sensitive)
+          sensitive: true
+        - name: api_key
+          value: (sensitive)
+          sensitive: true
+        - name: configure_tls
+          value: false
+        - name: insecure_skip_verify
+          value: false
+        - name: ca_file
+          value: ""
+        - name: mutual_tls
+          value: false
+        - name: cert_file
+          value: ""
+        - name: key_file
+          value: ""
+        - name: retry_on_failure_enabled
+          value: true
+        - name: num_workers
+          value: 0
+        - name: sending_queue_enabled
+          value: true
+        - name: sending_queue_num_consumers
+          value: 10
+        - name: sending_queue_queue_size
+          value: 5000
+        - name: persistent_queue_enabled
+          value: true
+        - name: persistent_queue_directory
+          value: $OIQ_OTEL_COLLECTOR_HOME/storage
+status:
+    latest: true

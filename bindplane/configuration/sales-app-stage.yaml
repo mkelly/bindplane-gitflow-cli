@@ -1,0 +1,148 @@
+apiVersion: bindplane.observiq.com/v1
+kind: Configuration
+metadata:
+    id: 333f59bf-ad3b-43c1-b962-c440cf6f0bb1
+    name: sales-app-stage
+    labels:
+        platform: macos
+    hash: d77157f4927d4de955b81fd2d821beb2d82cb62d1a8a52f86c84428501f62b81
+    version: 1
+    dateModified: 2023-10-15T13:06:51.065729-04:00
+spec:
+    contentType: ""
+    measurementInterval: ""
+    sources:
+        - id: 01HCQJB9N3DSD03V0TDX4J2TP6
+          type: syslog:1
+          parameters:
+            - name: listen_ip
+              value: 0.0.0.0
+            - name: listen_port
+              value: 5140
+            - name: protocol
+              value: rfc3164
+            - name: connection_type
+              value: udp
+            - name: data_flow
+              value: high
+            - name: timezone
+              value: UTC
+            - name: parse_to
+              value: body
+            - name: enable_octet_counting
+              value: false
+            - name: enable_non_transparent_framing_trailer
+              value: false
+            - name: non_transparent_framing_trailer
+              value: LF
+            - name: enable_mutual_tls
+              value: false
+            - name: cert_file
+              value: ""
+            - name: key_file
+              value: ""
+            - name: ca_file
+              value: ""
+            - name: tls_min_version
+              value: "1.2"
+        - id: 01HCQJB9N4SEE8P8ZT8EVE4VMX
+          type: file:1
+          parameters:
+            - name: file_path
+              value:
+                - /my/path
+            - name: exclude_file_path
+              value: []
+            - name: log_type
+              value: file
+            - name: parse_format
+              value: none
+            - name: regex_pattern
+              value: ""
+            - name: multiline_parsing
+              value: none
+            - name: multiline_line_start_pattern
+              value: ""
+            - name: multiline_line_end_pattern
+              value: ""
+            - name: parse_timestamp
+              value: false
+            - name: timestamp_field
+              value: timestamp
+            - name: parse_timestamp_format
+              value: RFC3339
+            - name: epoch_timestamp_format
+              value: s
+            - name: manual_timestamp_format
+              value: '%Y-%m-%dT%H:%M:%S.%f%z'
+            - name: timezone
+              value: UTC
+            - name: parse_severity
+              value: false
+            - name: severity_field
+              value: severity
+            - name: include_file_name_attribute
+              value: true
+            - name: include_file_path_attribute
+              value: false
+            - name: include_file_name_resolved_attribute
+              value: false
+            - name: include_file_path_resolved_attribute
+              value: false
+            - name: encoding
+              value: utf-8
+            - name: poll_interval
+              value: 200
+            - name: max_concurrent_files
+              value: 1024
+            - name: parse_to
+              value: body
+            - name: start_at
+              value: end
+            - name: fingerprint_size
+              value: 1kb
+            - name: enable_offset_storage
+              value: true
+            - name: offset_storage_dir
+              value: $OIQ_OTEL_COLLECTOR_HOME/storage
+            - name: retry_on_failure_enabled
+              value: false
+            - name: retry_on_failure_initial_interval
+              value: 1
+            - name: retry_on_failure_max_interval
+              value: 30
+            - name: retry_on_failure_max_elapsed_time
+              value: 300
+            - name: enable_sorting
+              value: false
+            - name: sort_rules
+              value: []
+    destinations:
+        - id: 01HCQJB9N4SEE8P8ZT8J7ZXDJT
+          name: splunk-north:1
+    selector:
+        matchLabels:
+            configuration: sales-app-stage
+status:
+    rollout:
+        name: ""
+        status: 4
+        options:
+            startAutomatically: false
+            rollbackOnFailure: true
+            phaseAgentCount:
+                initial: 1
+                multiplier: 1
+                maximum: 1
+            maxErrors: 0
+        phase: 5
+        progress:
+            completed: 6
+            errors: 0
+            pending: 0
+            waiting: 0
+    currentVersion: 1
+    pendingVersion: 1
+    latest: true
+    pending: true
+    current: true
