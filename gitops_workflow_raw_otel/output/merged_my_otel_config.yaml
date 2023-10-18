@@ -1,0 +1,33 @@
+apiVersion: bindplane.observiq.com/v1
+kind: Configuration
+metadata:
+  name: my_otel_config
+spec:
+  contentType: ""
+  measurementInterval: ""
+  raw: |-
+    receivers:
+      hostmetrics:
+        collection_interval: 1m
+        scrapers:
+          load:
+          filesystem:
+          memory:
+          network:
+
+    processors:
+      batch:
+
+    exporters:
+      logging:
+        loglevel: debug
+
+    service:
+      pipelines:
+        metrics:
+          receivers: [hostmetrics]
+          processors: [batch]
+          exporters: [logging]
+  selector:
+    matchLabels:
+      configuration: my_otel_config
