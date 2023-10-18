@@ -1,0 +1,49 @@
+# This configuration is managed by BindPlane OP.
+# Configuration: apache-dev:1
+receivers:
+    plugin/source0_01HCT27YV536QM2SCAPYN5FR0G:
+        parameters:
+            file_path:
+                - /var/log/apache2/access.log
+            start_at: end
+        path: $OIQ_OTEL_COLLECTOR_HOME/plugins/apache_common_logs.yaml
+processors:
+    batch/grafana-cloud-west: null
+exporters:
+    otlphttp/grafana-cloud-west:
+        auth:
+            authenticator: basicauth/grafana-cloud-west
+        compression: gzip
+        endpoint: https://otlp-gateway-prod-us-central-0.grafana.net/otlp
+        retry_on_failure:
+            enabled: true
+            initial_interval: 5s
+            max_elapsed_time: 300s
+            max_interval: 30s
+        sending_queue:
+            enabled: true
+            num_consumers: 10
+            queue_size: 5000
+            storage: file_storage/grafana-cloud-west
+extensions:
+    basicauth/grafana-cloud-west:
+        client_auth:
+            password: (sensitive)
+            username: asdfasdf
+    file_storage/grafana-cloud-west:
+        compaction:
+            directory: $OIQ_OTEL_COLLECTOR_HOME/storage
+            on_rebound: true
+        directory: $OIQ_OTEL_COLLECTOR_HOME/storage
+service:
+    extensions:
+        - basicauth/grafana-cloud-west
+        - file_storage/grafana-cloud-west
+    pipelines:
+        logs/source0_01HCT27YV536QM2SCAPYN5FR0G__grafana-cloud-west-0:
+            receivers:
+                - plugin/source0_01HCT27YV536QM2SCAPYN5FR0G
+            processors:
+                - batch/grafana-cloud-west
+            exporters:
+                - otlphttp/grafana-cloud-west
