@@ -1,4 +1,4 @@
-name: BindPlane OP Deploy and Export Raw
+name: GitOps Workflow
 on:
   push:
     branches:

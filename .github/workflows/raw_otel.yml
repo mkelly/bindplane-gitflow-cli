@@ -1,4 +1,4 @@
-name: BindPlane OP Deploy Raw
+name: Raw OTel GitOps Workflow
 on:
   workflow_dispatch:
   push:

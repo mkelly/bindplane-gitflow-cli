@@ -1,4 +1,4 @@
-name: BindPlane OP Deploy
+name: Basic GitOps Workflow
 on:
   push:
     branches:
