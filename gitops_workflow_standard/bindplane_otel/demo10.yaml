@@ -1,0 +1,101 @@
+# This configuration is managed by BindPlane OP.
+# Configuration: demo10:1
+receivers:
+    hostmetrics/source0_01HD1Q54DX7PVFZRP2QS8R3BE1:
+        collection_interval: 60s
+        scrapers:
+            filesystem:
+                metrics:
+                    system.filesystem.utilization:
+                        enabled: true
+            load:
+                metrics: null
+            paging:
+                metrics:
+                    system.paging.utilization:
+                        enabled: true
+            process:
+                metrics:
+                    process.context_switches:
+                        enabled: false
+                    process.cpu.utilization:
+                        enabled: false
+                    process.disk.operations:
+                        enabled: false
+                    process.handles:
+                        enabled: false
+                    process.memory.utilization:
+                        enabled: false
+                    process.open_file_descriptors:
+                        enabled: false
+                    process.paging.faults:
+                        enabled: false
+                    process.signals_pending:
+                        enabled: false
+                    process.threads:
+                        enabled: false
+                mute_process_name_error: true
+    plugin/source1_01HD1Q54DZ669VQPZZ6M3FEF9N__postgresql:
+        parameters:
+            postgresql_log_path:
+                - /var/log/postgresql/postgresql*.log
+                - /var/lib/pgsql/data/log/postgresql*.log
+                - /var/lib/pgsql/*/data/log/postgresql*.log
+            start_at: end
+        path: $OIQ_OTEL_COLLECTOR_HOME/plugins/postgresql_logs.yaml
+processors:
+    batch/OTLP: null
+    resourcedetection/source0_01HD1Q54DX7PVFZRP2QS8R3BE1:
+        detectors:
+            - system
+        system:
+            hostname_sources:
+                - os
+    resourcedetection/source1_01HD1Q54DZ669VQPZZ6M3FEF9N:
+        detectors:
+            - system
+        system:
+            hostname_sources:
+                - os
+exporters:
+    otlp/OTLP:
+        compression: gzip
+        endpoint: otel.corp.localnet:4317
+        retry_on_failure:
+            enabled: true
+            initial_interval: 5s
+            max_elapsed_time: 300s
+            max_interval: 30s
+        sending_queue:
+            enabled: true
+            num_consumers: 10
+            queue_size: 5000
+            storage: file_storage/OTLP
+        tls:
+            insecure: true
+extensions:
+    file_storage/OTLP:
+        compaction:
+            directory: $OIQ_OTEL_COLLECTOR_HOME/storage
+            on_rebound: true
+        directory: $OIQ_OTEL_COLLECTOR_HOME/storage
+service:
+    extensions:
+        - file_storage/OTLP
+    pipelines:
+        logs/source1_01HD1Q54DZ669VQPZZ6M3FEF9N__OTLP-0:
+            receivers:
+                - plugin/source1_01HD1Q54DZ669VQPZZ6M3FEF9N__postgresql
+            processors:
+                - resourcedetection/source1_01HD1Q54DZ669VQPZZ6M3FEF9N
+                - batch/OTLP
+            exporters:
+                - otlp/OTLP
+        metrics/source0_01HD1Q54DX7PVFZRP2QS8R3BE1__OTLP-0:
+            receivers:
+                - hostmetrics/source0_01HD1Q54DX7PVFZRP2QS8R3BE1
+            processors:
+                - resourcedetection/source0_01HD1Q54DX7PVFZRP2QS8R3BE1
+                - batch/OTLP
+            exporters:
+                - otlp/OTLP

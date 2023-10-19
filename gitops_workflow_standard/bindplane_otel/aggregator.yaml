@@ -1,0 +1,44 @@
+# This configuration is managed by BindPlane OP.
+# Configuration: aggregator:2
+receivers:
+    otlp/source0_01HC0RKHTN4PJY1NE059Z1QP1M:
+        protocols:
+            grpc:
+                endpoint: 0.0.0.0:4317
+                keepalive:
+                    server_parameters:
+                        max_connection_age: 60s
+                        max_connection_age_grace: 300s
+                        max_connection_idle: 60s
+                        time: 2h
+                        timeout: 20s
+            http:
+                endpoint: 0.0.0.0:4318
+exporters:
+    awss3/s3-archive:
+        s3uploader:
+            file_prefix: null
+            region: us-east-1
+            s3_bucket: s3-east1-archive
+            s3_partition: hour
+            s3_prefix: null
+service:
+    pipelines:
+        logs/source0_01HC0RKHTN4PJY1NE059Z1QP1M__s3-archive-0:
+            receivers:
+                - otlp/source0_01HC0RKHTN4PJY1NE059Z1QP1M
+            processors: []
+            exporters:
+                - awss3/s3-archive
+        metrics/source0_01HC0RKHTN4PJY1NE059Z1QP1M__s3-archive-0:
+            receivers:
+                - otlp/source0_01HC0RKHTN4PJY1NE059Z1QP1M
+            processors: []
+            exporters:
+                - awss3/s3-archive
+        traces/source0_01HC0RKHTN4PJY1NE059Z1QP1M__s3-archive-0:
+            receivers:
+                - otlp/source0_01HC0RKHTN4PJY1NE059Z1QP1M
+            processors: []
+            exporters:
+                - awss3/s3-archive

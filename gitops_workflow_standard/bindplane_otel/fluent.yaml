@@ -1,0 +1,39 @@
+# This configuration is managed by BindPlane OP.
+# Configuration: fluent:7
+receivers:
+    fluentforward/source0_01H57Y7K906NNRF89FZW5MC9B4:
+        endpoint: 0.0.0.0:24224
+processors:
+    logcount/source0_01H57Y7K906NNRF89FZW5MC9B4__processor0:
+        interval: 60s
+        metric_name: fluent.log.count
+        metric_unit: '{logs}'
+        ottl_match: "true"
+        route: source0_01H57Y7K906NNRF89FZW5MC9B4__processor0
+    transform/source0_01H57Y7K906NNRF89FZW5MC9B4__processor1__logs:
+        error_mode: ignore
+        log_statements:
+            - context: log
+              statements:
+                - set(resource.attributes["aggregator-zone"], "us-east1-a") where true
+exporters:
+    datadog/Datadog:
+        api:
+            key: (sensitive)
+            site: datadoghq.com
+        metrics:
+            resource_attributes_as_tags: true
+        retry_on_failure:
+            enabled: false
+        sending_queue:
+            enabled: false
+service:
+    pipelines:
+        logs/source0_01H57Y7K906NNRF89FZW5MC9B4__Datadog-0:
+            receivers:
+                - fluentforward/source0_01H57Y7K906NNRF89FZW5MC9B4
+            processors:
+                - logcount/source0_01H57Y7K906NNRF89FZW5MC9B4__processor0
+                - transform/source0_01H57Y7K906NNRF89FZW5MC9B4__processor1__logs
+            exporters:
+                - datadog/Datadog

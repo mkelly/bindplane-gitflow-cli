@@ -1,0 +1,104 @@
+# This configuration is managed by BindPlane OP.
+# Configuration: postgres-template:1
+receivers:
+    plugin/source0_01H4PJADWWSZZVFKPGC2NZJVB2__postgresql:
+        parameters:
+            postgresql_log_path:
+                - /var/lib/pgsql/14/data/log/postgresql.log
+            start_at: end
+        path: $OIQ_OTEL_COLLECTOR_HOME/plugins/postgresql_logs.yaml
+    postgresql/source0_01H4PJADWWSZZVFKPGC2NZJVB2:
+        collection_interval: 60s
+        endpoint: localhost:5432
+        metrics: null
+        password: (sensitive)
+        tls:
+            insecure: true
+        transport: tcp
+        username: otel
+processors:
+    batch/Splunk: null
+    batch/s3-archive-0__processor0:
+        send_batch_max_size: 600
+        send_batch_size: 500
+        timeout: 2s
+    batch/source0_01H4PJADWWSZZVFKPGC2NZJVB2__processor1:
+        send_batch_max_size: 400
+        send_batch_size: 200
+        timeout: 1s
+    filter/Splunk-1__processor0__logs:
+        error_mode: ignore
+        logs:
+            log_record:
+                - |-
+                  (
+
+                  attributes["log_type"] == "postgresql.slow_query"
+
+                  )
+    filter/source0_01H4PJADWWSZZVFKPGC2NZJVB2__processor0:
+        logs:
+            include:
+                severity_number:
+                    match_undefined: true
+                    min: WARN
+    resourcedetection/source0_01H4PJADWWSZZVFKPGC2NZJVB2:
+        detectors:
+            - system
+        system:
+            hostname_sources:
+                - os
+exporters:
+    awss3/s3-archive:
+        s3uploader:
+            region: us-east-1
+            s3_bucket: s3-east1-archive
+            s3_partition: hour
+            s3_prefix: null
+    splunk_hec/Splunk:
+        disable_compression: false
+        endpoint: http://splunk-east1-vip:8088/services/collector/event
+        index: bindplane
+        max_content_length_logs: 2097152
+        max_content_length_metrics: 2097152
+        max_content_length_traces: 2097152
+        max_event_size: 2097152
+        retry_on_failure:
+            enabled: false
+        sending_queue:
+            enabled: false
+        tls:
+            insecure: true
+        token: 0034-50555-666-42
+service:
+    pipelines:
+        logs/source0_01H4PJADWWSZZVFKPGC2NZJVB2__Splunk-1:
+            receivers:
+                - plugin/source0_01H4PJADWWSZZVFKPGC2NZJVB2__postgresql
+            processors:
+                - resourcedetection/source0_01H4PJADWWSZZVFKPGC2NZJVB2
+                - filter/source0_01H4PJADWWSZZVFKPGC2NZJVB2__processor0
+                - batch/source0_01H4PJADWWSZZVFKPGC2NZJVB2__processor1
+                - filter/Splunk-1__processor0__logs
+                - batch/Splunk
+            exporters:
+                - splunk_hec/Splunk
+        logs/source0_01H4PJADWWSZZVFKPGC2NZJVB2__s3-archive-0:
+            receivers:
+                - plugin/source0_01H4PJADWWSZZVFKPGC2NZJVB2__postgresql
+            processors:
+                - resourcedetection/source0_01H4PJADWWSZZVFKPGC2NZJVB2
+                - filter/source0_01H4PJADWWSZZVFKPGC2NZJVB2__processor0
+                - batch/source0_01H4PJADWWSZZVFKPGC2NZJVB2__processor1
+                - batch/s3-archive-0__processor0
+            exporters:
+                - awss3/s3-archive
+        metrics/source0_01H4PJADWWSZZVFKPGC2NZJVB2__s3-archive-0:
+            receivers:
+                - postgresql/source0_01H4PJADWWSZZVFKPGC2NZJVB2
+            processors:
+                - resourcedetection/source0_01H4PJADWWSZZVFKPGC2NZJVB2
+                - batch/source0_01H4PJADWWSZZVFKPGC2NZJVB2__processor1
+                - batch/s3-archive-0__processor0
+            exporters:
+                - awss3/s3-archive

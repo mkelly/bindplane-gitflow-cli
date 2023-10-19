@@ -1,0 +1,89 @@
+# This configuration is managed by BindPlane OP.
+# Configuration: postgres-db-template:1
+receivers:
+    hostmetrics/source1_01H9RJPYA389M94VM2YHBGQNXZ:
+        collection_interval: 60s
+        scrapers:
+            filesystem:
+                metrics:
+                    system.filesystem.utilization:
+                        enabled: true
+            load:
+                metrics: null
+            memory:
+                metrics:
+                    system.memory.utilization:
+                        enabled: true
+            paging:
+                metrics:
+                    system.paging.utilization:
+                        enabled: true
+            process:
+                metrics:
+                    process.context_switches:
+                        enabled: false
+                    process.cpu.utilization:
+                        enabled: false
+                    process.disk.operations:
+                        enabled: false
+                    process.handles:
+                        enabled: false
+                    process.memory.utilization:
+                        enabled: false
+                    process.open_file_descriptors:
+                        enabled: false
+                    process.paging.faults:
+                        enabled: false
+                    process.signals_pending:
+                        enabled: false
+                    process.threads:
+                        enabled: false
+                mute_process_name_error: true
+    plugin/source0_01H9RJPYA0H882W34WYJX6QQ4H__postgresql:
+        parameters:
+            postgresql_log_path:
+                - /var/log/postgresql/postgresql*.log
+                - /var/lib/pgsql/data/log/postgresql*.log
+                - /var/lib/pgsql/*/data/log/postgresql*.log
+            start_at: end
+        path: $OIQ_OTEL_COLLECTOR_HOME/plugins/postgresql_logs.yaml
+processors:
+    resourcedetection/source0_01H9RJPYA0H882W34WYJX6QQ4H:
+        detectors:
+            - system
+        system:
+            hostname_sources:
+                - os
+    resourcedetection/source1_01H9RJPYA389M94VM2YHBGQNXZ:
+        detectors:
+            - system
+        system:
+            hostname_sources:
+                - os
+exporters:
+    googlecloud/Google:
+        log:
+            compression: gzip
+            resource_filters:
+                - regex: .*
+        metric:
+            compression: gzip
+        project: bindplane-op-demo
+        sending_queue:
+            enabled: false
+service:
+    pipelines:
+        logs/source0_01H9RJPYA0H882W34WYJX6QQ4H__Google-0:
+            receivers:
+                - plugin/source0_01H9RJPYA0H882W34WYJX6QQ4H__postgresql
+            processors:
+                - resourcedetection/source0_01H9RJPYA0H882W34WYJX6QQ4H
+            exporters:
+                - googlecloud/Google
+        metrics/source1_01H9RJPYA389M94VM2YHBGQNXZ__Google-0:
+            receivers:
+                - hostmetrics/source1_01H9RJPYA389M94VM2YHBGQNXZ
+            processors:
+                - resourcedetection/source1_01H9RJPYA389M94VM2YHBGQNXZ
+            exporters:
+                - googlecloud/Google

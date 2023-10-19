@@ -1,0 +1,150 @@
+# This configuration is managed by BindPlane OP.
+# Configuration: iis-template:1
+receivers:
+    hostmetrics/source0_01H4PJADWXBG1MPXGE59Y8KZ8W:
+        collection_interval: 60s
+        scrapers:
+            filesystem:
+                metrics:
+                    system.filesystem.utilization:
+                        enabled: true
+            load:
+                metrics:
+                    system.cpu.load_average.5m:
+                        enabled: false
+            memory:
+                metrics:
+                    system.memory.utilization:
+                        enabled: true
+            paging:
+                metrics:
+                    system.paging.utilization:
+                        enabled: true
+    iis/source1_01H4PJADX0BW6PBXMX20701PHF:
+        collection_interval: 60s
+        metrics: null
+    plugin/source1_01H4PJADX0BW6PBXMX20701PHF:
+        parameters:
+            file_path:
+                - C:/inetpub/logs/LogFiles/W3SVC*/**/*.log
+            parse_to: body
+            timezone: UTC
+        path: $OIQ_OTEL_COLLECTOR_HOME/plugins/iis_logs.yaml
+    windowseventlog/source2_01H4PJADXBZDH3G1Q9X07ZJDYC__application:
+        attributes:
+            log_type: windows_event.application
+        channel: application
+        max_reads: 100
+        poll_interval: 1s
+        raw: false
+        start_at: end
+    windowseventlog/source2_01H4PJADXBZDH3G1Q9X07ZJDYC__security:
+        attributes:
+            log_type: windows_event.security
+        channel: security
+        max_reads: 100
+        poll_interval: 1s
+        raw: false
+        start_at: end
+    windowseventlog/source2_01H4PJADXBZDH3G1Q9X07ZJDYC__system:
+        attributes:
+            log_type: windows_event.system
+        channel: system
+        max_reads: 100
+        poll_interval: 1s
+        raw: false
+        start_at: end
+processors:
+    logdedup/source1_01H4PJADX0BW6PBXMX20701PHF__processor0:
+        interval: 1s
+        log_count_attribute: log_count
+        timezone: UTC
+    removeemptyvalues/source1_01H4PJADX0BW6PBXMX20701PHF__processor1__logs:
+        empty_string_values:
+            - ""
+            - '-'
+        remove_empty_lists: false
+        remove_empty_maps: false
+        remove_nulls: true
+    resourcedetection/source0_01H4PJADWXBG1MPXGE59Y8KZ8W:
+        detectors:
+            - system
+        system:
+            hostname_sources:
+                - os
+    resourcedetection/source1_01H4PJADX0BW6PBXMX20701PHF:
+        detectors:
+            - system
+        system:
+            hostname_sources:
+                - os
+    resourcedetection/source2_01H4PJADXBZDH3G1Q9X07ZJDYC:
+        detectors:
+            - system
+        system:
+            hostname_sources:
+                - os
+    transform/source1_01H4PJADX0BW6PBXMX20701PHF__processor2__logs:
+        error_mode: ignore
+        log_statements:
+            - context: log
+              statements:
+                - delete_key(resource.attributes, "host.id") where true
+                - delete_key(body, "s-port") where true
+                - delete_key(body, "s-ip") where true
+    transform/source2_01H4PJADXBZDH3G1Q9X07ZJDYC__processor0__logs:
+        error_mode: ignore
+        log_statements:
+            - context: log
+              statements:
+                - delete_key(resource.attributes, "host.id") where true
+                - delete_key(body, "keywords") where true
+                - delete_key(body, "system_time") where true
+                - delete_key(body, "task") where true
+exporters:
+    googlecloud/Google:
+        log:
+            compression: gzip
+            resource_filters:
+                - regex: .*
+        metric:
+            compression: gzip
+        project: bindplane-op-demo
+        sending_queue:
+            enabled: false
+service:
+    pipelines:
+        logs/source1_01H4PJADX0BW6PBXMX20701PHF__Google-0:
+            receivers:
+                - plugin/source1_01H4PJADX0BW6PBXMX20701PHF
+            processors:
+                - resourcedetection/source1_01H4PJADX0BW6PBXMX20701PHF
+                - logdedup/source1_01H4PJADX0BW6PBXMX20701PHF__processor0
+                - removeemptyvalues/source1_01H4PJADX0BW6PBXMX20701PHF__processor1__logs
+                - transform/source1_01H4PJADX0BW6PBXMX20701PHF__processor2__logs
+            exporters:
+                - googlecloud/Google
+        logs/source2_01H4PJADXBZDH3G1Q9X07ZJDYC__Google-0:
+            receivers:
+                - windowseventlog/source2_01H4PJADXBZDH3G1Q9X07ZJDYC__system
+                - windowseventlog/source2_01H4PJADXBZDH3G1Q9X07ZJDYC__application
+                - windowseventlog/source2_01H4PJADXBZDH3G1Q9X07ZJDYC__security
+            processors:
+                - resourcedetection/source2_01H4PJADXBZDH3G1Q9X07ZJDYC
+                - transform/source2_01H4PJADXBZDH3G1Q9X07ZJDYC__processor0__logs
+            exporters:
+                - googlecloud/Google
+        metrics/source0_01H4PJADWXBG1MPXGE59Y8KZ8W__Google-0:
+            receivers:
+                - hostmetrics/source0_01H4PJADWXBG1MPXGE59Y8KZ8W
+            processors:
+                - resourcedetection/source0_01H4PJADWXBG1MPXGE59Y8KZ8W
+            exporters:
+                - googlecloud/Google
+        metrics/source1_01H4PJADX0BW6PBXMX20701PHF__Google-0:
+            receivers:
+                - iis/source1_01H4PJADX0BW6PBXMX20701PHF
+            processors:
+                - resourcedetection/source1_01H4PJADX0BW6PBXMX20701PHF
+            exporters:
+                - googlecloud/Google

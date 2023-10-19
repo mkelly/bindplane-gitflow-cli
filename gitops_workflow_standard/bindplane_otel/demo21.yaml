@@ -1,0 +1,95 @@
+# This configuration is managed by BindPlane OP.
+# Configuration: demo21:2
+receivers:
+    otlp/source0_01HCDN0MEW5MH7489R796QGQK0:
+        protocols:
+            grpc:
+                endpoint: 0.0.0.0:4317
+                keepalive:
+                    server_parameters:
+                        max_connection_age: 60s
+                        max_connection_age_grace: 300s
+                        max_connection_idle: 60s
+                        time: 2h
+                        timeout: 20s
+            http:
+                endpoint: 0.0.0.0:4318
+processors:
+    filter/source0_01HCDN0MEW5MH7489R796QGQK0__processor0:
+        logs:
+            include:
+                severity_number:
+                    match_undefined: true
+                    min: WARN
+exporters:
+    elasticsearch/Elastic__logs:
+        endpoints:
+            - https://test.test
+        logs_index: logs-generic-default
+        num_workers: 0
+        pipeline: null
+        retry:
+            enabled: true
+        sending_queue:
+            enabled: true
+            num_consumers: 10
+            queue_size: 5000
+            storage: file_storage/Elastic
+        tls: null
+    elasticsearch/Elastic__traces:
+        endpoints:
+            - https://test.test
+        num_workers: 0
+        pipeline: null
+        retry:
+            enabled: true
+        sending_queue:
+            enabled: true
+            num_consumers: 10
+            queue_size: 5000
+            storage: file_storage/Elastic
+        tls: null
+        traces_index: traces-generic-default
+    logging/logging: null
+extensions:
+    file_storage/Elastic:
+        compaction:
+            directory: $OIQ_OTEL_COLLECTOR_HOME/storage
+            on_rebound: true
+        directory: $OIQ_OTEL_COLLECTOR_HOME/storage
+service:
+    extensions:
+        - file_storage/Elastic
+    pipelines:
+        logs/source0_01HCDN0MEW5MH7489R796QGQK0__Elastic-0:
+            receivers:
+                - otlp/source0_01HCDN0MEW5MH7489R796QGQK0
+            processors:
+                - filter/source0_01HCDN0MEW5MH7489R796QGQK0__processor0
+            exporters:
+                - elasticsearch/Elastic__logs
+        logs/source0_01HCDN0MEW5MH7489R796QGQK0__logging-1:
+            receivers:
+                - otlp/source0_01HCDN0MEW5MH7489R796QGQK0
+            processors:
+                - filter/source0_01HCDN0MEW5MH7489R796QGQK0__processor0
+            exporters:
+                - logging/logging
+        metrics/source0_01HCDN0MEW5MH7489R796QGQK0__logging-1:
+            receivers:
+                - otlp/source0_01HCDN0MEW5MH7489R796QGQK0
+            processors: []
+            exporters:
+                - logging/logging
+        traces/source0_01HCDN0MEW5MH7489R796QGQK0__Elastic-0:
+            receivers:
+                - otlp/source0_01HCDN0MEW5MH7489R796QGQK0
+            processors: []
+            exporters:
+                - elasticsearch/Elastic__traces
+        traces/source0_01HCDN0MEW5MH7489R796QGQK0__logging-1:
+            receivers:
+                - otlp/source0_01HCDN0MEW5MH7489R796QGQK0
+            processors: []
+            exporters:
+                - logging/logging

@@ -1,0 +1,164 @@
+# This configuration is managed by BindPlane OP.
+# Configuration: webserver:5
+receivers:
+    hostmetrics/source1_01HAHRXVCAJ7DP1QS98VGNJD2H:
+        collection_interval: 60s
+        scrapers:
+            cpu:
+                metrics:
+                    system.cpu.utilization:
+                        enabled: true
+            filesystem:
+                metrics:
+                    system.filesystem.utilization:
+                        enabled: true
+            load:
+                metrics: null
+            memory:
+                metrics:
+                    system.memory.utilization:
+                        enabled: true
+            paging:
+                metrics:
+                    system.paging.utilization:
+                        enabled: true
+            process:
+                metrics:
+                    process.context_switches:
+                        enabled: false
+                    process.cpu.utilization:
+                        enabled: false
+                    process.disk.operations:
+                        enabled: false
+                    process.handles:
+                        enabled: false
+                    process.memory.utilization:
+                        enabled: false
+                    process.open_file_descriptors:
+                        enabled: false
+                    process.paging.faults:
+                        enabled: false
+                    process.signals_pending:
+                        enabled: false
+                    process.threads:
+                        enabled: false
+                mute_process_name_error: true
+    nginx/source0_01H4PJADTF6AS2NFXPPAK7CB2R:
+        collection_interval: 60s
+        endpoint: http://localhost:80/status
+        metrics: null
+        tls:
+            insecure: true
+    plugin/source0_01H4PJADTF6AS2NFXPPAK7CB2R__nginx:
+        parameters:
+            access_log_paths:
+                - /var/log/nginx/access.log*
+            data_flow: high
+            error_log_paths:
+                - /var/log/nginx/error.log*
+            log_format: default
+            start_at: end
+        path: $OIQ_OTEL_COLLECTOR_HOME/plugins/nginx_logs.yaml
+processors:
+    batch/Google-0__processor0:
+        send_batch_max_size: 0
+        send_batch_size: 8192
+        timeout: 200ms
+    batch/Grafana: null
+    filter/source0_01H4PJADTF6AS2NFXPPAK7CB2R__processor0:
+        logs:
+            include:
+                severity_number:
+                    match_undefined: true
+                    min: WARN
+    resourcedetection/source0_01H4PJADTF6AS2NFXPPAK7CB2R:
+        detectors:
+            - system
+        system:
+            hostname_sources:
+                - os
+    resourcedetection/source1_01HAHRXVCAJ7DP1QS98VGNJD2H:
+        detectors:
+            - system
+        system:
+            hostname_sources:
+                - os
+exporters:
+    googlecloud/Google:
+        log:
+            compression: gzip
+            resource_filters:
+                - regex: .*
+        metric:
+            compression: gzip
+        project: bindplane-op-demo
+        sending_queue:
+            enabled: false
+    otlphttp/Grafana:
+        auth:
+            authenticator: basicauth/Grafana
+        compression: gzip
+        endpoint: https://otlp-gateway-prod-us-central-0.grafana.net/otlp
+        retry_on_failure:
+            enabled: false
+        sending_queue:
+            enabled: false
+extensions:
+    basicauth/Grafana:
+        client_auth:
+            password: (sensitive)
+            username: 3.339555e+06
+service:
+    extensions:
+        - basicauth/Grafana
+    pipelines:
+        logs/source0_01H4PJADTF6AS2NFXPPAK7CB2R__Google-0:
+            receivers:
+                - plugin/source0_01H4PJADTF6AS2NFXPPAK7CB2R__nginx
+            processors:
+                - resourcedetection/source0_01H4PJADTF6AS2NFXPPAK7CB2R
+                - filter/source0_01H4PJADTF6AS2NFXPPAK7CB2R__processor0
+                - batch/Google-0__processor0
+            exporters:
+                - googlecloud/Google
+        logs/source0_01H4PJADTF6AS2NFXPPAK7CB2R__Grafana-1:
+            receivers:
+                - plugin/source0_01H4PJADTF6AS2NFXPPAK7CB2R__nginx
+            processors:
+                - resourcedetection/source0_01H4PJADTF6AS2NFXPPAK7CB2R
+                - filter/source0_01H4PJADTF6AS2NFXPPAK7CB2R__processor0
+                - batch/Grafana
+            exporters:
+                - otlphttp/Grafana
+        metrics/source0_01H4PJADTF6AS2NFXPPAK7CB2R__Google-0:
+            receivers:
+                - nginx/source0_01H4PJADTF6AS2NFXPPAK7CB2R
+            processors:
+                - resourcedetection/source0_01H4PJADTF6AS2NFXPPAK7CB2R
+                - batch/Google-0__processor0
+            exporters:
+                - googlecloud/Google
+        metrics/source0_01H4PJADTF6AS2NFXPPAK7CB2R__Grafana-1:
+            receivers:
+                - nginx/source0_01H4PJADTF6AS2NFXPPAK7CB2R
+            processors:
+                - resourcedetection/source0_01H4PJADTF6AS2NFXPPAK7CB2R
+                - batch/Grafana
+            exporters:
+                - otlphttp/Grafana
+        metrics/source1_01HAHRXVCAJ7DP1QS98VGNJD2H__Google-0:
+            receivers:
+                - hostmetrics/source1_01HAHRXVCAJ7DP1QS98VGNJD2H
+            processors:
+                - resourcedetection/source1_01HAHRXVCAJ7DP1QS98VGNJD2H
+                - batch/Google-0__processor0
+            exporters:
+                - googlecloud/Google
+        metrics/source1_01HAHRXVCAJ7DP1QS98VGNJD2H__Grafana-1:
+            receivers:
+                - hostmetrics/source1_01HAHRXVCAJ7DP1QS98VGNJD2H
+            processors:
+                - resourcedetection/source1_01HAHRXVCAJ7DP1QS98VGNJD2H
+                - batch/Grafana
+            exporters:
+                - otlphttp/Grafana

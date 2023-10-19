@@ -1,53 +1,91 @@
 # This configuration is managed by BindPlane OP.
 # Configuration: test:1
 receivers:
-    otlp/source0_01HCDADJGYVQ6CPKY6M3WHEASN:
-        protocols:
-            grpc:
-                endpoint: 0.0.0.0:4392
-                keepalive:
-                    server_parameters:
-                        max_connection_age: 60s
-                        max_connection_age_grace: 300s
-                        max_connection_idle: 60s
-                        time: 2h
-                        timeout: 20s
-            http:
-                endpoint: 0.0.0.0:4318
+    syslog/source0_01HCZJA5Z32WZX77QEWQ58TA7C:
+        location: UTC
+        operators:
+            - from: attributes.appname
+              id: move_appname
+              if: attributes.appname != nil
+              to: body.appname
+              type: move
+            - from: attributes.facility
+              id: move_facility
+              if: attributes.facility != nil
+              to: body.facility
+              type: move
+            - from: attributes.hostname
+              id: move_hostname
+              if: attributes.hostname != nil
+              to: body.hostname
+              type: move
+            - from: attributes.message
+              id: move_message
+              if: attributes.message != nil
+              to: body.message
+              type: move
+            - from: attributes.msg_id
+              id: move_msg_id
+              if: attributes.msg_id != nil
+              to: body.msg_id
+              type: move
+            - from: attributes.priority
+              id: move_priority
+              if: attributes.priority != nil
+              to: body.priority
+              type: move
+            - from: attributes.proc_id
+              id: move_proc_id
+              if: attributes.proc_id != nil
+              to: body.proc_id
+              type: move
+            - from: attributes.severity
+              id: move_severity
+              if: attributes.severity != nil
+              to: body.severity
+              type: move
+            - from: attributes.structured_data
+              id: move_structured_data
+              if: attributes.structured_data != nil
+              to: body.structured_data
+              type: move
+            - from: attributes.timestamp
+              id: move_timestamp
+              if: attributes.timestamp != nil
+              to: body.timestamp
+              type: move
+            - from: attributes.version
+              id: move_version
+              if: attributes.version != nil
+              to: body.version
+              type: move
+        protocol: rfc3164
+        udp:
+            listen_address: 0.0.0.0:5140
 processors:
-    batch/nr-otlp: null
+    resourcedetection/source0_01HCZJA5Z32WZX77QEWQ58TA7C:
+        detectors:
+            - system
+        system:
+            hostname_sources:
+                - os
 exporters:
-    otlp/nr-otlp:
-        compression: gzip
-        endpoint: https://otlp.nr-data.net:443
-        headers:
-            - api-key: (sensitive)
-        retry_on_failure:
-            enabled: false
+    googlecloud/Google:
+        log:
+            compression: gzip
+            resource_filters:
+                - regex: .*
+        metric:
+            compression: gzip
+        project: bindplane-op-demo
         sending_queue:
             enabled: false
-        tls:
-            insecure: false
 service:
     pipelines:
-        logs/source0_01HCDADJGYVQ6CPKY6M3WHEASN__nr-otlp-0:
+        logs/source0_01HCZJA5Z32WZX77QEWQ58TA7C__Google-0:
             receivers:
-                - otlp/source0_01HCDADJGYVQ6CPKY6M3WHEASN
+                - syslog/source0_01HCZJA5Z32WZX77QEWQ58TA7C
             processors:
-                - batch/nr-otlp
+                - resourcedetection/source0_01HCZJA5Z32WZX77QEWQ58TA7C
             exporters:
-                - otlp/nr-otlp
-        metrics/source0_01HCDADJGYVQ6CPKY6M3WHEASN__nr-otlp-0:
-            receivers:
-                - otlp/source0_01HCDADJGYVQ6CPKY6M3WHEASN
-            processors:
-                - batch/nr-otlp
-            exporters:
-                - otlp/nr-otlp
-        traces/source0_01HCDADJGYVQ6CPKY6M3WHEASN__nr-otlp-0:
-            receivers:
-                - otlp/source0_01HCDADJGYVQ6CPKY6M3WHEASN
-            processors:
-                - batch/nr-otlp
-            exporters:
-                - otlp/nr-otlp
+                - googlecloud/Google

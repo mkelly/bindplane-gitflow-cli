@@ -1,0 +1,175 @@
+# This configuration is managed by BindPlane OP.
+# Configuration: sales-endpoint-template:1
+receivers:
+    hostmetrics/source0_01H57RC284YV4ZATJ63FMZNFKC:
+        collection_interval: 60s
+        scrapers:
+            filesystem:
+                metrics:
+                    system.filesystem.utilization:
+                        enabled: true
+            load:
+                metrics: null
+            memory:
+                metrics:
+                    system.memory.utilization:
+                        enabled: true
+            network:
+                metrics:
+                    system.network.conntrack.count:
+                        enabled: true
+                    system.network.conntrack.max:
+                        enabled: true
+            paging:
+                metrics:
+                    system.paging.utilization:
+                        enabled: true
+            process:
+                metrics:
+                    process.context_switches:
+                        enabled: false
+                    process.cpu.utilization:
+                        enabled: false
+                    process.disk.operations:
+                        enabled: false
+                    process.handles:
+                        enabled: true
+                    process.memory.utilization:
+                        enabled: false
+                    process.open_file_descriptors:
+                        enabled: false
+                    process.paging.faults:
+                        enabled: false
+                    process.signals_pending:
+                        enabled: false
+                    process.threads:
+                        enabled: false
+                mute_process_name_error: true
+    syslog/source1_01H57RC286BDB3YRVWPS68P2XZ:
+        location: UTC
+        operators:
+            - from: attributes.appname
+              id: move_appname
+              if: attributes.appname != nil
+              to: body.appname
+              type: move
+            - from: attributes.facility
+              id: move_facility
+              if: attributes.facility != nil
+              to: body.facility
+              type: move
+            - from: attributes.hostname
+              id: move_hostname
+              if: attributes.hostname != nil
+              to: body.hostname
+              type: move
+            - from: attributes.message
+              id: move_message
+              if: attributes.message != nil
+              to: body.message
+              type: move
+            - from: attributes.msg_id
+              id: move_msg_id
+              if: attributes.msg_id != nil
+              to: body.msg_id
+              type: move
+            - from: attributes.priority
+              id: move_priority
+              if: attributes.priority != nil
+              to: body.priority
+              type: move
+            - from: attributes.proc_id
+              id: move_proc_id
+              if: attributes.proc_id != nil
+              to: body.proc_id
+              type: move
+            - from: attributes.severity
+              id: move_severity
+              if: attributes.severity != nil
+              to: body.severity
+              type: move
+            - from: attributes.structured_data
+              id: move_structured_data
+              if: attributes.structured_data != nil
+              to: body.structured_data
+              type: move
+            - from: attributes.timestamp
+              id: move_timestamp
+              if: attributes.timestamp != nil
+              to: body.timestamp
+              type: move
+            - from: attributes.version
+              id: move_version
+              if: attributes.version != nil
+              to: body.version
+              type: move
+        protocol: rfc3164
+        udp:
+            listen_address: 0.0.0.0:5140
+processors:
+    batch/Grafana: null
+    batch/source0_01H57RC284YV4ZATJ63FMZNFKC__processor0:
+        send_batch_max_size: 0
+        send_batch_size: 8192
+        timeout: 200ms
+    batch/source1_01H57RC286BDB3YRVWPS68P2XZ__processor1:
+        send_batch_max_size: 200
+        send_batch_size: 200
+        timeout: 200ms
+    resourcedetection/source0_01H57RC284YV4ZATJ63FMZNFKC:
+        detectors:
+            - system
+        system:
+            hostname_sources:
+                - os
+    resourcedetection/source1_01H57RC286BDB3YRVWPS68P2XZ:
+        detectors:
+            - system
+        system:
+            hostname_sources:
+                - os
+    transform/source1_01H57RC286BDB3YRVWPS68P2XZ__processor0__logs:
+        error_mode: ignore
+        log_statements:
+            - context: log
+              statements:
+                - delete_key(resource.attributes, "host.id") where true
+                - delete_key(body, "proc_id") where true
+exporters:
+    otlphttp/Grafana:
+        auth:
+            authenticator: basicauth/Grafana
+        compression: gzip
+        endpoint: https://otlp-gateway-prod-us-central-0.grafana.net/otlp
+        retry_on_failure:
+            enabled: false
+        sending_queue:
+            enabled: false
+extensions:
+    basicauth/Grafana:
+        client_auth:
+            password: (sensitive)
+            username: 3.339555e+06
+service:
+    extensions:
+        - basicauth/Grafana
+    pipelines:
+        logs/source1_01H57RC286BDB3YRVWPS68P2XZ__Grafana-0:
+            receivers:
+                - syslog/source1_01H57RC286BDB3YRVWPS68P2XZ
+            processors:
+                - resourcedetection/source1_01H57RC286BDB3YRVWPS68P2XZ
+                - transform/source1_01H57RC286BDB3YRVWPS68P2XZ__processor0__logs
+                - batch/source1_01H57RC286BDB3YRVWPS68P2XZ__processor1
+                - batch/Grafana
+            exporters:
+                - otlphttp/Grafana
+        metrics/source0_01H57RC284YV4ZATJ63FMZNFKC__Grafana-0:
+            receivers:
+                - hostmetrics/source0_01H57RC284YV4ZATJ63FMZNFKC
+            processors:
+                - resourcedetection/source0_01H57RC284YV4ZATJ63FMZNFKC
+                - batch/source0_01H57RC284YV4ZATJ63FMZNFKC__processor0
+                - batch/Grafana
+            exporters:
+                - otlphttp/Grafana

@@ -1,0 +1,187 @@
+# This configuration is managed by BindPlane OP.
+# Configuration: iis:22
+receivers:
+    hostmetrics/source0_01H4PJADWXBG1MPXGE59Y8KZ8W:
+        collection_interval: 60s
+        scrapers:
+            filesystem:
+                metrics:
+                    system.filesystem.utilization:
+                        enabled: true
+            load:
+                metrics:
+                    system.cpu.load_average.5m:
+                        enabled: false
+            memory:
+                metrics:
+                    system.memory.utilization:
+                        enabled: true
+            paging:
+                metrics:
+                    system.paging.utilization:
+                        enabled: true
+    iis/source1_01H4PJADX0BW6PBXMX20701PHF:
+        collection_interval: 60s
+        metrics: null
+    plugin/source1_01H4PJADX0BW6PBXMX20701PHF:
+        parameters:
+            file_path:
+                - C:/inetpub/logs/LogFiles/W3SVC*/**/*.log
+            parse_to: body
+            timezone: UTC
+        path: $OIQ_OTEL_COLLECTOR_HOME/plugins/iis_logs.yaml
+    windowseventlog/source2_01H4PJADXBZDH3G1Q9X07ZJDYC__application:
+        attributes:
+            log_type: windows_event.application
+        channel: application
+        max_reads: 100
+        poll_interval: 1s
+        raw: false
+        start_at: end
+    windowseventlog/source2_01H4PJADXBZDH3G1Q9X07ZJDYC__security:
+        attributes:
+            log_type: windows_event.security
+        channel: security
+        max_reads: 100
+        poll_interval: 1s
+        raw: false
+        start_at: end
+    windowseventlog/source2_01H4PJADXBZDH3G1Q9X07ZJDYC__system:
+        attributes:
+            log_type: windows_event.system
+        channel: system
+        max_reads: 100
+        poll_interval: 1s
+        raw: false
+        start_at: end
+processors:
+    filter/source1_01H4PJADX0BW6PBXMX20701PHF__processor0:
+        logs:
+            include:
+                severity_number:
+                    match_undefined: true
+                    min: WARN
+    logdedup/source2_01H4PJADXBZDH3G1Q9X07ZJDYC__processor0:
+        interval: 10s
+        log_count_attribute: log_count
+        timezone: UTC
+    mask/source2_01H4PJADXBZDH3G1Q9X07ZJDYC__processor1:
+        rules:
+            card: \b(?:(?:(?:\d{4}[- ]?){3}\d{4}|\d{15,16}))\b
+            dob: \b(0?[1-9]|1[0-2])\/(0?[1-9]|[12]\d|3[01])\/(?:\d{2})?\d{2}\b
+            email: \b[a-zA-Z0-9._\/\+\-—|]+@[A-Za-z0-9.\-—|]+\.?[a-zA-Z|]{0,6}\b
+            iban: \b[A-Z]{2}\d{2}[A-Z\d]{1,30}\b
+            ipv4: \b(?:[0-9]{1,3}\.){3}[0-9]{1,3}\b
+            ipv6: \b(?:[0-9a-fA-F]{1,4}:){7}[0-9a-fA-F]{1,4}\b
+            mac_address: \b([0-9A-Fa-f]{2}[:-]){5}[0-9A-Fa-f]{2}\b
+            phone_number: \b((\+|\b)[1l][\-\. ])?\(?\b[\dOlZSB]{3,5}([\-\. ]|\) ?)[\dOlZSB]{3}[\-\. ][\dOlZSB]{4}\b
+            ssn: \b\d{3}[- ]\d{2}[- ]\d{4}\b
+            us_city_state: \b[A-Z][A-Za-z\s\.]+,\s{0,1}[A-Z]{2}\b
+            us_street_address: \b\d+\s[A-z]+\s[A-z]+(\s[A-z]+)?\s*\d*\b
+            us_zip_code: \b\d{5}(?:[-\s]\d{4})?\b
+            uuid_guid: \b[a-fA-F0-9]{8}-[a-fA-F0-9]{4}-4[a-fA-F0-9]{3}-[8|9|aA|bB][a-fA-F0-9]{3}-[a-fA-F0-9]{12}\b
+    resourcedetection/source0_01H4PJADWXBG1MPXGE59Y8KZ8W:
+        detectors:
+            - system
+        system:
+            hostname_sources:
+                - os
+    resourcedetection/source1_01H4PJADX0BW6PBXMX20701PHF:
+        detectors:
+            - system
+        system:
+            hostname_sources:
+                - os
+    resourcedetection/source2_01H4PJADXBZDH3G1Q9X07ZJDYC:
+        detectors:
+            - system
+        system:
+            hostname_sources:
+                - os
+exporters:
+    elasticsearch/Elastic__logs:
+        endpoints:
+            - https://test.test
+        logs_index: logs-generic-default
+        num_workers: 0
+        pipeline: null
+        retry:
+            enabled: true
+        sending_queue:
+            enabled: true
+            num_consumers: 10
+            queue_size: 5000
+            storage: file_storage/Elastic
+        tls: null
+    googlecloud/Google:
+        log:
+            compression: gzip
+            resource_filters:
+                - regex: .*
+        metric:
+            compression: gzip
+        project: bindplane-op-demo
+        sending_queue:
+            enabled: false
+extensions:
+    file_storage/Elastic:
+        compaction:
+            directory: $OIQ_OTEL_COLLECTOR_HOME/storage
+            on_rebound: true
+        directory: $OIQ_OTEL_COLLECTOR_HOME/storage
+service:
+    extensions:
+        - file_storage/Elastic
+    pipelines:
+        logs/source1_01H4PJADX0BW6PBXMX20701PHF__Elastic-1:
+            receivers:
+                - plugin/source1_01H4PJADX0BW6PBXMX20701PHF
+            processors:
+                - resourcedetection/source1_01H4PJADX0BW6PBXMX20701PHF
+                - filter/source1_01H4PJADX0BW6PBXMX20701PHF__processor0
+            exporters:
+                - elasticsearch/Elastic__logs
+        logs/source1_01H4PJADX0BW6PBXMX20701PHF__Google-0:
+            receivers:
+                - plugin/source1_01H4PJADX0BW6PBXMX20701PHF
+            processors:
+                - resourcedetection/source1_01H4PJADX0BW6PBXMX20701PHF
+                - filter/source1_01H4PJADX0BW6PBXMX20701PHF__processor0
+            exporters:
+                - googlecloud/Google
+        logs/source2_01H4PJADXBZDH3G1Q9X07ZJDYC__Elastic-1:
+            receivers:
+                - windowseventlog/source2_01H4PJADXBZDH3G1Q9X07ZJDYC__system
+                - windowseventlog/source2_01H4PJADXBZDH3G1Q9X07ZJDYC__application
+                - windowseventlog/source2_01H4PJADXBZDH3G1Q9X07ZJDYC__security
+            processors:
+                - resourcedetection/source2_01H4PJADXBZDH3G1Q9X07ZJDYC
+                - logdedup/source2_01H4PJADXBZDH3G1Q9X07ZJDYC__processor0
+                - mask/source2_01H4PJADXBZDH3G1Q9X07ZJDYC__processor1
+            exporters:
+                - elasticsearch/Elastic__logs
+        logs/source2_01H4PJADXBZDH3G1Q9X07ZJDYC__Google-0:
+            receivers:
+                - windowseventlog/source2_01H4PJADXBZDH3G1Q9X07ZJDYC__system
+                - windowseventlog/source2_01H4PJADXBZDH3G1Q9X07ZJDYC__application
+                - windowseventlog/source2_01H4PJADXBZDH3G1Q9X07ZJDYC__security
+            processors:
+                - resourcedetection/source2_01H4PJADXBZDH3G1Q9X07ZJDYC
+                - logdedup/source2_01H4PJADXBZDH3G1Q9X07ZJDYC__processor0
+                - mask/source2_01H4PJADXBZDH3G1Q9X07ZJDYC__processor1
+            exporters:
+                - googlecloud/Google
+        metrics/source0_01H4PJADWXBG1MPXGE59Y8KZ8W__Google-0:
+            receivers:
+                - hostmetrics/source0_01H4PJADWXBG1MPXGE59Y8KZ8W
+            processors:
+                - resourcedetection/source0_01H4PJADWXBG1MPXGE59Y8KZ8W
+            exporters:
+                - googlecloud/Google
+        metrics/source1_01H4PJADX0BW6PBXMX20701PHF__Google-0:
+            receivers:
+                - iis/source1_01H4PJADX0BW6PBXMX20701PHF
+            processors:
+                - resourcedetection/source1_01H4PJADX0BW6PBXMX20701PHF
+            exporters:
+                - googlecloud/Google

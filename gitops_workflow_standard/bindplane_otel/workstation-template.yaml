@@ -1,0 +1,113 @@
+# This configuration is managed by BindPlane OP.
+# Configuration: workstation-template:1
+receivers:
+    filelog/source1_01HAMMMEZH22JDSE415KN93C69:
+        encoding: utf-8
+        fingerprint_size: 1kb
+        include:
+            - /var/log/syslog
+        include_file_name: true
+        include_file_name_resolved: false
+        include_file_path: false
+        include_file_path_resolved: false
+        max_concurrent_files: 1024
+        operators:
+            - field: attributes.log_type
+              type: add
+              value: file
+        poll_interval: 200ms
+        retry_on_failure:
+            enabled: false
+        start_at: end
+        storage: file_storage/source1_01HAMMMEZH22JDSE415KN93C69
+    hostmetrics/source0_01HAMMMEZETEDTMET44TAT6A61:
+        collection_interval: 60s
+        scrapers:
+            filesystem:
+                metrics:
+                    system.filesystem.utilization:
+                        enabled: true
+            load:
+                metrics: null
+            memory:
+                metrics:
+                    system.memory.utilization:
+                        enabled: true
+            network:
+                metrics:
+                    system.network.conntrack.count:
+                        enabled: true
+                    system.network.conntrack.max:
+                        enabled: true
+            paging:
+                metrics:
+                    system.paging.utilization:
+                        enabled: true
+processors:
+    batch/OTLP: null
+    batch/OTLP-0__processor0:
+        send_batch_max_size: 0
+        send_batch_size: 8192
+        timeout: 200ms
+    resourcedetection/source0_01HAMMMEZETEDTMET44TAT6A61:
+        detectors:
+            - system
+        system:
+            hostname_sources:
+                - os
+    resourcedetection/source1_01HAMMMEZH22JDSE415KN93C69:
+        detectors:
+            - system
+        system:
+            hostname_sources:
+                - os
+exporters:
+    otlp/OTLP:
+        compression: gzip
+        endpoint: otel.corp.localnet:4317
+        retry_on_failure:
+            enabled: true
+            initial_interval: 5s
+            max_elapsed_time: 300s
+            max_interval: 30s
+        sending_queue:
+            enabled: true
+            num_consumers: 10
+            queue_size: 5000
+            storage: file_storage/OTLP
+        tls:
+            insecure: true
+extensions:
+    file_storage/OTLP:
+        compaction:
+            directory: $OIQ_OTEL_COLLECTOR_HOME/storage
+            on_rebound: true
+        directory: $OIQ_OTEL_COLLECTOR_HOME/storage
+    file_storage/source1_01HAMMMEZH22JDSE415KN93C69:
+        compaction:
+            directory: $OIQ_OTEL_COLLECTOR_HOME/storage
+            on_rebound: true
+        directory: $OIQ_OTEL_COLLECTOR_HOME/storage
+service:
+    extensions:
+        - file_storage/OTLP
+        - file_storage/source1_01HAMMMEZH22JDSE415KN93C69
+    pipelines:
+        logs/source1_01HAMMMEZH22JDSE415KN93C69__OTLP-0:
+            receivers:
+                - filelog/source1_01HAMMMEZH22JDSE415KN93C69
+            processors:
+                - resourcedetection/source1_01HAMMMEZH22JDSE415KN93C69
+                - batch/OTLP-0__processor0
+                - batch/OTLP
+            exporters:
+                - otlp/OTLP
+        metrics/source0_01HAMMMEZETEDTMET44TAT6A61__OTLP-0:
+            receivers:
+                - hostmetrics/source0_01HAMMMEZETEDTMET44TAT6A61
+            processors:
+                - resourcedetection/source0_01HAMMMEZETEDTMET44TAT6A61
+                - batch/OTLP-0__processor0
+                - batch/OTLP
+            exporters:
+                - otlp/OTLP

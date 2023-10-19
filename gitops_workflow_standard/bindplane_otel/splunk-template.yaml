@@ -1,0 +1,75 @@
+# This configuration is managed by BindPlane OP.
+# Configuration: splunk-template:1
+receivers:
+    tcplog/source0_01H6ERY29XK8GTTE0JXD5JK912:
+        add_attributes: true
+        listen_address: 0.0.0.0:8779
+        operators:
+            - field: attributes.log_type
+              type: add
+              value: splunk_tcp
+processors:
+    batch/Splunk: null
+    resourcedetection/source0_01H6ERY29XK8GTTE0JXD5JK912:
+        detectors:
+            - system
+        system:
+            hostname_sources:
+                - os
+    transform/source0_01H6ERY29XK8GTTE0JXD5JK912__processor0__logs:
+        error_mode: ignore
+        log_statements:
+            - context: log
+              statements:
+                - delete_key(resource.attributes, "host.id") where true
+                - delete_key(attributes, "net.host.name") where true
+                - delete_key(attributes, "net.host.port") where true
+                - delete_key(attributes, "log_type") where true
+                - delete_key(attributes, "net.peer.ip") where true
+                - delete_key(attributes, "net.peer.port") where true
+                - delete_key(attributes, "net.transport") where true
+exporters:
+    googlecloud/Google:
+        log:
+            compression: gzip
+            resource_filters:
+                - regex: .*
+        metric:
+            compression: gzip
+        project: bindplane-op-demo
+        sending_queue:
+            enabled: false
+    splunk_hec/Splunk:
+        disable_compression: false
+        endpoint: http://splunk-east1-vip:8088/services/collector/event
+        index: bindplane
+        max_content_length_logs: 2097152
+        max_content_length_metrics: 2097152
+        max_content_length_traces: 2097152
+        max_event_size: 2097152
+        retry_on_failure:
+            enabled: false
+        sending_queue:
+            enabled: false
+        tls:
+            insecure: true
+        token: 0034-50555-666-42
+service:
+    pipelines:
+        logs/source0_01H6ERY29XK8GTTE0JXD5JK912__Google-1:
+            receivers:
+                - tcplog/source0_01H6ERY29XK8GTTE0JXD5JK912
+            processors:
+                - resourcedetection/source0_01H6ERY29XK8GTTE0JXD5JK912
+                - transform/source0_01H6ERY29XK8GTTE0JXD5JK912__processor0__logs
+            exporters:
+                - googlecloud/Google
+        logs/source0_01H6ERY29XK8GTTE0JXD5JK912__Splunk-0:
+            receivers:
+                - tcplog/source0_01H6ERY29XK8GTTE0JXD5JK912
+            processors:
+                - resourcedetection/source0_01H6ERY29XK8GTTE0JXD5JK912
+                - transform/source0_01H6ERY29XK8GTTE0JXD5JK912__processor0__logs
+                - batch/Splunk
+            exporters:
+                - splunk_hec/Splunk
