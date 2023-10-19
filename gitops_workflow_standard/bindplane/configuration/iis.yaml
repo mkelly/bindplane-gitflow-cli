@@ -36,7 +36,6 @@ spec:
                 - system.processes.created
                 - system.cpu.utilization
                 - system.cpu.time
-                - system.cpu.load_average.5m
             - name: enable_process
               value: false
             - name: process_metrics_filtering
