@@ -1,5 +1,5 @@
 # This configuration is managed by BindPlane OP.
-# Configuration: iis:23
+# Configuration: iis:24
 receivers:
     hostmetrics/source0_01H4PJADWXBG1MPXGE59Y8KZ8W:
         collection_interval: 30s
@@ -9,9 +9,7 @@ receivers:
                     system.filesystem.utilization:
                         enabled: true
             load:
-                metrics:
-                    system.cpu.load_average.5m:
-                        enabled: false
+                metrics: null
             memory:
                 metrics:
                     system.memory.utilization:
