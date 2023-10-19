@@ -1,0 +1,41 @@
+name: Rollout Changes
+on:
+  workflow_dispatch:
+  # push:
+  #   branches:
+  #     - main
+  #     - dev
+
+jobs:
+  bindplane:
+    runs-on: "ubuntu-22.04"
+    steps:
+      - name: Check out source code
+        uses: actions/checkout@v4
+        with:
+          ref: ${{ github.event.pull_request.head.sha }}
+
+      - run: mkdir download
+
+      - name: Install BindPlane CLI
+        run: |
+          curl -o bindplane.zip https://storage.googleapis.com/bindplane-op-releases/bindplane/latest/bindplane-ee-linux-amd64.zip
+          unzip bindplane.zip
+          sudo chmod +x bindplane
+          sudo mv bindplane /usr/local/bin/bindplane
+        working-directory: download
+
+      - name: Create Profile
+        run: |
+          bindplane profile set gitflow \
+            --remote-url https://app.bindplane.com \
+            --api-key ${{ secrets.BINDPLANE_API_KEY }}
+          bindplane profile use gitflow
+
+      - name: Test CLI
+        run: bindplane version
+
+      - name: Rollout Changes
+        run: |
+          cd gitops_workflow_standard
+          bash ./rollout_bindplane_configs.sh
