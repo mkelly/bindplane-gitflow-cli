@@ -4,6 +4,8 @@
 SOURCE_DIR="source"
 OUTPUT_DIR="bindplane_otel"
 
+rm -rf "${OUTPUT_DIR}"
+
 # Create a directory for each command's output
 mkdir -p "${OUTPUT_DIR}"
 
