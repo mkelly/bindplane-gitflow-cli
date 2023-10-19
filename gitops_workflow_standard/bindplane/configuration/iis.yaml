@@ -62,7 +62,7 @@ spec:
             - name: process_filter_match_strategy
               value: regexp
             - name: collection_interval
-              value: 60
+              value: 30
         - id: 01H4PJADX0BW6PBXMX20701PHF
           type: iis:2
           parameters:
