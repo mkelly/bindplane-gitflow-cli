@@ -1,0 +1,122 @@
+apiVersion: bindplane.observiq.com/v1
+kind: Configuration
+metadata:
+    id: ff24b3fc-493e-45ea-8b9a-e54d1ccb217f
+    name: webserver
+    description: Edge proxy for application API.
+    labels:
+        platform: linux
+    hash: a7e933baeba8facb9487fbc4df3e9892ace7a66c7766913413dc65123bdcbad5
+    version: 5
+    dateModified: 2023-10-09T19:07:10.940198826Z
+spec:
+    contentType: ""
+    measurementInterval: ""
+    sources:
+        - id: 01H4PJADTF6AS2NFXPPAK7CB2R
+          displayName: Nginx Logs
+          type: nginx:5
+          parameters:
+            - name: enable_metrics
+              value: true
+            - name: endpoint
+              value: http://localhost:80/status
+            - name: disable_metrics
+              value: []
+            - name: enable_tls
+              value: false
+            - name: insecure_skip_verify
+              value: false
+            - name: ca_file
+              value: ""
+            - name: cert_file
+              value: ""
+            - name: key_file
+              value: ""
+            - name: collection_interval
+              value: 60
+            - name: enable_logs
+              value: true
+            - name: data_flow
+              value: high
+            - name: log_format
+              value: default
+            - name: access_log_paths
+              value:
+                - /var/log/nginx/access.log*
+            - name: error_log_paths
+              value:
+                - /var/log/nginx/error.log*
+            - name: start_at
+              value: end
+          processors:
+            - id: 01HAHS056VK6K5Q4XQPD881HHD
+              type: filter_severity:4
+              parameters:
+                - name: severity
+                  value: WARN
+        - id: 01HAHRXVCAJ7DP1QS98VGNJD2H
+          type: host:3
+          parameters:
+            - name: metric_filtering
+              value:
+                - system.network.connections
+                - system.network.conntrack.count
+                - system.network.conntrack.max
+                - system.network.dropped
+                - system.network.errors
+                - system.network.io
+                - system.network.packets
+                - system.disk.io
+                - system.disk.io_time
+                - system.disk.merged
+                - system.disk.operation_time
+                - system.disk.operations
+                - system.disk.pending_operations
+                - system.disk.weighted_io_time
+                - system.processes.count
+                - system.processes.created
+            - name: enable_process
+              value: true
+            - name: process_metrics_filtering
+              value:
+                - process.context_switches
+                - process.cpu.utilization
+                - process.disk.operations
+                - process.memory.utilization
+                - process.open_file_descriptors
+                - process.paging.faults
+                - process.signals_pending
+                - process.threads
+                - process.handles
+            - name: enable_process_filter
+              value: false
+            - name: process_include
+              value: []
+            - name: process_exclude
+              value: []
+            - name: process_filter_match_strategy
+              value: regexp
+            - name: collection_interval
+              value: 60
+    destinations:
+        - id: 01H4PJADW4MGV595ZJ2N52BNM2
+          name: Google:10
+          processors:
+            - id: 01H57R4357817DHE1BGH7BDTAS
+              type: batch:3
+              parameters:
+                - name: send_batch_size
+                  value: 8192
+                - name: send_batch_max_size
+                  value: 0
+                - name: timeout
+                  value: 200ms
+        - id: 01HAHSBZW5W65EN4PSSYVJHFSM
+          name: Grafana:4
+    selector:
+        matchLabels:
+            configuration: webserver
+status:
+    currentVersion: 4
+    latest: true

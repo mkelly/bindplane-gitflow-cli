@@ -1,0 +1,155 @@
+apiVersion: bindplane.observiq.com/v1
+kind: Configuration
+metadata:
+    id: 135fabbe-de2b-4a23-b478-42acf4727725
+    name: nginx-template
+    description: Edge proxy for application API.
+    labels:
+        platform: linux
+    hash: cefc3adfe53c6bd1d165cab154c4b773ee6abda38ef92be4422c89df66fd05a7
+    version: 1
+    dateModified: 2023-10-09T19:07:10.967176675Z
+spec:
+    contentType: ""
+    measurementInterval: ""
+    sources:
+        - id: 01H4PJADTF6AS2NFXPPAK7CB2R
+          displayName: Nginx Logs
+          type: nginx:5
+          parameters:
+            - name: enable_metrics
+              value: true
+            - name: endpoint
+              value: http://localhost:80/status
+            - name: disable_metrics
+              value: []
+            - name: enable_tls
+              value: false
+            - name: insecure_skip_verify
+              value: false
+            - name: ca_file
+              value: ""
+            - name: cert_file
+              value: ""
+            - name: key_file
+              value: ""
+            - name: collection_interval
+              value: 60
+            - name: enable_logs
+              value: true
+            - name: data_flow
+              value: high
+            - name: log_format
+              value: default
+            - name: access_log_paths
+              value:
+                - /var/log/nginx/access.log*
+            - name: error_log_paths
+              value:
+                - /var/log/nginx/error.log*
+            - name: start_at
+              value: end
+          processors:
+            - id: 01H4PJADPD3E15266C4KBB27ZC
+              type: count_telemetry:6
+              parameters:
+                - name: enable_logs
+                  value: true
+                - name: log_match
+                  value: "true"
+                - name: log_metric_name
+                  value: nginx.status_codes
+                - name: log_metric_units
+                  value: '{logs}'
+                - name: log_enable_attributes
+                  value: true
+                - name: log_attributes
+                  value:
+                    status: attributes["http_request_status"]
+                - name: enable_metrics
+                  value: false
+                - name: datapoint_match
+                  value: "true"
+                - name: datapoint_metric_name
+                  value: datapoint.count
+                - name: datapoint_metric_units
+                  value: '{datapoints}'
+                - name: datapoint_enable_attributes
+                  value: false
+                - name: enable_traces
+                  value: false
+                - name: span_match
+                  value: "true"
+                - name: span_metric_name
+                  value: span.count
+                - name: span_metric_units
+                  value: '{spans}'
+                - name: span_enable_attributes
+                  value: false
+                - name: interval
+                  value: 60
+            - id: 01H4PJADPH4YF7T76AM668X67W
+              type: log_dedup:5
+              parameters:
+                - name: interval
+                  value: 1
+                - name: log_count_attribute
+                  value: log_count
+                - name: exclude_fields
+                  value: []
+                - name: timezone
+                  value: UTC
+            - id: 01H4PJADPMKG2EAKGHBCTHGY6E
+              type: delete_empty_values:5
+              parameters:
+                - name: telemetry_types
+                  value:
+                    - Logs
+                - name: deleted_values
+                  value:
+                    - Null Values
+                - name: exclude_resource_keys
+                  value: []
+                - name: exclude_attribute_keys
+                  value: []
+                - name: exclude_body_keys
+                  value: []
+                - name: empty_string_values
+                  value:
+                    - '-'
+            - id: 01H4PJADPRACKB1HDB5803FR06
+              type: mask_sensitive_data:6
+              parameters:
+                - name: default_rules
+                  value:
+                    - IPv4 Address
+                    - IPv6 Address
+                - name: telemetry_types
+                  value:
+                    - Logs
+                - name: exclude_resource_keys
+                  value: []
+                - name: exclude_attribute_keys
+                  value: []
+                - name: exclude_body_keys
+                  value: []
+                - name: custom_rules
+                  value: {}
+    destinations:
+        - id: 01H4PJADW4MGV595ZJ2N52BNM2
+          name: Google:10
+          processors:
+            - id: 01H57R4357817DHE1BGH7BDTAS
+              type: batch:3
+              parameters:
+                - name: send_batch_size
+                  value: 8192
+                - name: send_batch_max_size
+                  value: 0
+                - name: timeout
+                  value: 200ms
+    selector:
+        matchLabels:
+            configuration: nginx-template
+status:
+    latest: true

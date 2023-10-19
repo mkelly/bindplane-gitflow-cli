@@ -1,0 +1,53 @@
+apiVersion: bindplane.observiq.com/v1
+kind: Destination
+metadata:
+    id: Splunk-C4-HF
+    name: Splunk-C4-HF
+    hash: a76835a3325092175fe66478d947ef2b3a1397f5821b3f79e1e3980c6881e635
+    version: 2
+    dateModified: 2023-09-20T17:16:07.534823285Z
+spec:
+    type: splunkhec:7
+    parameters:
+        - name: token
+          value: 619ac760-b450-4f22-a623-fc585127d180
+        - name: index
+          value: otel
+        - name: hostname
+          value: splunk-c4-hf.bluemedora.localnet
+        - name: port
+          value: 8088
+        - name: path
+          value: /services/collector/event
+        - name: max_request_size
+          value: 2.097152e+06
+        - name: max_event_size
+          value: 2.097152e+06
+        - name: enable_compression
+          value: true
+        - name: enable_tls
+          value: false
+        - name: insecure_skip_verify
+          value: false
+        - name: ca_file
+          value: ""
+        - name: retry_on_failure_enabled
+          value: true
+        - name: retry_on_failure_initial_interval
+          value: 5
+        - name: retry_on_failure_max_interval
+          value: 30
+        - name: retry_on_failure_max_elapsed_time
+          value: 300
+        - name: sending_queue_enabled
+          value: true
+        - name: sending_queue_num_consumers
+          value: 10
+        - name: sending_queue_queue_size
+          value: 5000
+        - name: persistent_queue_enabled
+          value: true
+        - name: persistent_queue_directory
+          value: $OIQ_OTEL_COLLECTOR_HOME/storage
+status:
+    latest: true

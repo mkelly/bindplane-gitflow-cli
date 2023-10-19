@@ -1,0 +1,55 @@
+apiVersion: bindplane.observiq.com/v1
+kind: Configuration
+metadata:
+    id: test
+    name: test
+    labels:
+        platform: linux
+    hash: 3fe21cb59f81b89003ff1082d6b9f3e2830edb62b825942e5f5359b212b4a687
+    version: 1
+    dateModified: 2023-10-17T19:37:57.48431949Z
+spec:
+    contentType: ""
+    measurementInterval: ""
+    sources:
+        - id: 01HCZJA5Z32WZX77QEWQ58TA7C
+          type: syslog:2
+          parameters:
+            - name: listen_ip
+              value: 0.0.0.0
+            - name: listen_port
+              value: 5140
+            - name: protocol
+              value: rfc3164
+            - name: connection_type
+              value: udp
+            - name: data_flow
+              value: high
+            - name: timezone
+              value: UTC
+            - name: parse_to
+              value: body
+            - name: enable_octet_counting
+              value: false
+            - name: enable_non_transparent_framing_trailer
+              value: false
+            - name: non_transparent_framing_trailer
+              value: LF
+            - name: enable_mutual_tls
+              value: false
+            - name: cert_file
+              value: ""
+            - name: key_file
+              value: ""
+            - name: ca_file
+              value: ""
+            - name: tls_min_version
+              value: "1.2"
+    destinations:
+        - id: 01HCZJA5Z7THCSQCKV1MT84EDQ
+          name: Google:10
+    selector:
+        matchLabels:
+            configuration: test
+status:
+    latest: true

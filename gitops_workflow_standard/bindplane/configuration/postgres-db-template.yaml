@@ -1,0 +1,107 @@
+apiVersion: bindplane.observiq.com/v1
+kind: Configuration
+metadata:
+    id: d4ece436-9e64-40b2-99cd-446d92891a3d
+    name: postgres-db-template
+    labels:
+        platform: linux
+    hash: 944d7f7803545bc36f4c4f31c4795e46f69f5b583da85ebbbe938abf074bb9a5
+    version: 1
+    dateModified: 2023-10-09T19:07:10.738929107Z
+spec:
+    contentType: ""
+    measurementInterval: ""
+    sources:
+        - id: 01H9RJPYA0H882W34WYJX6QQ4H
+          type: postgresql:10
+          parameters:
+            - name: enable_metrics
+              value: false
+            - name: endpoint
+              value: localhost:5432
+            - name: transport
+              value: tcp
+            - name: username
+              value: ""
+            - name: password
+              value: (sensitive)
+              sensitive: true
+            - name: databases
+              value: []
+            - name: collection_interval
+              value: 60
+            - name: enable_tls
+              value: false
+            - name: ca_file
+              value: ""
+            - name: cert_file
+              value: ""
+            - name: key_file
+              value: ""
+            - name: insecure_skip_verify
+              value: false
+            - name: disable_metrics
+              value: []
+            - name: enable_logs
+              value: true
+            - name: postgresql_log_path
+              value:
+                - /var/log/postgresql/postgresql*.log
+                - /var/lib/pgsql/data/log/postgresql*.log
+                - /var/lib/pgsql/*/data/log/postgresql*.log
+            - name: start_at
+              value: end
+        - id: 01H9RJPYA389M94VM2YHBGQNXZ
+          type: host:3
+          parameters:
+            - name: metric_filtering
+              value:
+                - system.network.connections
+                - system.network.conntrack.count
+                - system.network.conntrack.max
+                - system.network.dropped
+                - system.network.errors
+                - system.network.io
+                - system.network.packets
+                - system.disk.io
+                - system.disk.io_time
+                - system.disk.merged
+                - system.disk.operation_time
+                - system.disk.operations
+                - system.disk.pending_operations
+                - system.disk.weighted_io_time
+                - system.processes.count
+                - system.processes.created
+                - system.cpu.time
+                - system.cpu.utilization
+            - name: enable_process
+              value: true
+            - name: process_metrics_filtering
+              value:
+                - process.context_switches
+                - process.cpu.utilization
+                - process.disk.operations
+                - process.memory.utilization
+                - process.open_file_descriptors
+                - process.paging.faults
+                - process.signals_pending
+                - process.threads
+                - process.handles
+            - name: enable_process_filter
+              value: false
+            - name: process_include
+              value: []
+            - name: process_exclude
+              value: []
+            - name: process_filter_match_strategy
+              value: regexp
+            - name: collection_interval
+              value: 60
+    destinations:
+        - id: 01H9RJPYA631JRF33M0DD87TAF
+          name: Google:10
+    selector:
+        matchLabels:
+            configuration: postgres-db-template
+status:
+    latest: true

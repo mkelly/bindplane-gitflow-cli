@@ -1,0 +1,53 @@
+apiVersion: bindplane.observiq.com/v1
+kind: Destination
+metadata:
+    id: Splunk
+    name: Splunk
+    hash: cc1ebb16a5e3b570d14df17e4e6e3c84af719bb0db7a783a48567bace66eac1a
+    version: 8
+    dateModified: 2023-09-20T17:16:07.505519482Z
+spec:
+    type: splunkhec:7
+    parameters:
+        - name: token
+          value: 0034-50555-666-42
+        - name: index
+          value: bindplane
+        - name: hostname
+          value: splunk-east1-vip
+        - name: port
+          value: 8088
+        - name: path
+          value: /services/collector/event
+        - name: max_request_size
+          value: 2.097152e+06
+        - name: max_event_size
+          value: 2.097152e+06
+        - name: enable_compression
+          value: true
+        - name: enable_tls
+          value: false
+        - name: insecure_skip_verify
+          value: false
+        - name: ca_file
+          value: ""
+        - name: retry_on_failure_enabled
+          value: false
+        - name: retry_on_failure_initial_interval
+          value: 5
+        - name: retry_on_failure_max_interval
+          value: 30
+        - name: retry_on_failure_max_elapsed_time
+          value: 300
+        - name: sending_queue_enabled
+          value: false
+        - name: sending_queue_num_consumers
+          value: 10
+        - name: sending_queue_queue_size
+          value: 5000
+        - name: persistent_queue_enabled
+          value: true
+        - name: persistent_queue_directory
+          value: $OIQ_OTEL_COLLECTOR_HOME/storage
+status:
+    latest: true

@@ -1,0 +1,109 @@
+apiVersion: bindplane.observiq.com/v1
+kind: Configuration
+metadata:
+    id: demo10
+    name: demo10
+    labels:
+        platform: macos
+    hash: b3746876102d24fdaee047f6a2b652c6a87aa64913db9fb5b61304f7d489a348
+    version: 1
+    dateModified: 2023-10-18T15:41:03.815119841Z
+spec:
+    contentType: ""
+    measurementInterval: ""
+    sources:
+        - id: 01HD1Q54DX7PVFZRP2QS8R3BE1
+          type: host:3
+          parameters:
+            - name: metric_filtering
+              value:
+                - system.network.connections
+                - system.network.conntrack.count
+                - system.network.conntrack.max
+                - system.network.dropped
+                - system.network.errors
+                - system.network.io
+                - system.network.packets
+                - system.memory.usage
+                - system.memory.utilization
+                - system.disk.io
+                - system.disk.io_time
+                - system.disk.merged
+                - system.disk.operation_time
+                - system.disk.operations
+                - system.disk.pending_operations
+                - system.disk.weighted_io_time
+                - system.processes.count
+                - system.processes.created
+                - system.cpu.time
+                - system.cpu.utilization
+            - name: enable_process
+              value: true
+            - name: process_metrics_filtering
+              value:
+                - process.context_switches
+                - process.cpu.utilization
+                - process.disk.operations
+                - process.memory.utilization
+                - process.open_file_descriptors
+                - process.paging.faults
+                - process.signals_pending
+                - process.threads
+                - process.handles
+            - name: enable_process_filter
+              value: false
+            - name: process_include
+              value: []
+            - name: process_exclude
+              value: []
+            - name: process_filter_match_strategy
+              value: regexp
+            - name: collection_interval
+              value: 60
+        - id: 01HD1Q54DZ669VQPZZ6M3FEF9N
+          type: postgresql:10
+          parameters:
+            - name: enable_metrics
+              value: false
+            - name: endpoint
+              value: localhost:5432
+            - name: transport
+              value: tcp
+            - name: username
+              value: ""
+            - name: password
+              value: (sensitive)
+              sensitive: true
+            - name: databases
+              value: []
+            - name: collection_interval
+              value: 60
+            - name: enable_tls
+              value: false
+            - name: ca_file
+              value: ""
+            - name: cert_file
+              value: ""
+            - name: key_file
+              value: ""
+            - name: insecure_skip_verify
+              value: false
+            - name: disable_metrics
+              value: []
+            - name: enable_logs
+              value: true
+            - name: postgresql_log_path
+              value:
+                - /var/log/postgresql/postgresql*.log
+                - /var/lib/pgsql/data/log/postgresql*.log
+                - /var/lib/pgsql/*/data/log/postgresql*.log
+            - name: start_at
+              value: end
+    destinations:
+        - id: 01HD1Q54E2DPMQANA4D61XE72A
+          name: OTLP:2
+    selector:
+        matchLabels:
+            configuration: demo10
+status:
+    latest: true

@@ -1,0 +1,28 @@
+apiVersion: bindplane.observiq.com/v1
+kind: Destination
+metadata:
+    id: s3-archive
+    name: s3-archive
+    hash: 363a9b18b4fee73062435fbb959c23d08d2ab0d49bdeaefbc58bfd6c0877c094
+    version: 2
+    dateModified: 2023-09-20T17:16:07.525209526Z
+spec:
+    type: aws_s3:2
+    parameters:
+        - name: telemetry_types
+          value:
+            - Logs
+            - Metrics
+            - Traces
+        - name: region
+          value: us-east-1
+        - name: bucket
+          value: s3-east1-archive
+        - name: prefix
+          value: ""
+        - name: file_prefix
+          value: ""
+        - name: partition
+          value: hour
+status:
+    latest: true

@@ -1,0 +1,102 @@
+apiVersion: bindplane.observiq.com/v1
+kind: Configuration
+metadata:
+    id: splunk
+    name: splunk
+    description: Aggregator configuration for receiving logs from Splunk Universal Forwarders.
+    labels:
+        platform: linux
+    hash: eb08586a36153f57125916b643c603df280f834c583b5c834cb3a81494fd9537
+    version: 7
+    dateModified: 2023-10-09T19:07:10.763046267Z
+spec:
+    contentType: ""
+    measurementInterval: 10s
+    sources:
+        - id: 01H6ERY29XK8GTTE0JXD5JK912
+          type: splunk_tcp:2
+          parameters:
+            - name: listen_ip
+              value: 0.0.0.0
+            - name: listen_port
+              value: 8779
+            - name: log_type
+              value: splunk_tcp
+            - name: parse_format
+              value: none
+            - name: regex_pattern
+              value: ""
+            - name: parse_timestamp
+              value: false
+            - name: timestamp_field
+              value: timestamp
+            - name: parse_timestamp_format
+              value: RFC3339
+            - name: epoch_timestamp_format
+              value: s
+            - name: manual_timestamp_format
+              value: '%Y-%m-%dT%H:%M:%S.%f%z'
+            - name: timezone
+              value: UTC
+            - name: parse_severity
+              value: false
+            - name: severity_field
+              value: severity
+            - name: parse_to
+              value: body
+            - name: enable_tls
+              value: false
+            - name: tls_certificate_path
+              value: ""
+            - name: tls_private_key_path
+              value: ""
+            - name: tls_min_version
+              value: "1.2"
+          processors:
+            - id: 01H6ES2KCQCS3N3ZGNKJA20Y37
+              type: delete_fields:7
+              parameters:
+                - name: enable_logs
+                  value: true
+                - name: log_condition
+                  value: "true"
+                - name: log_resource_attributes
+                  value:
+                    - host.id
+                - name: log_attributes
+                  value:
+                    - net.host.name
+                    - net.host.port
+                    - log_type
+                    - net.peer.ip
+                    - net.peer.port
+                    - net.transport
+                - name: log_body_keys
+                  value: []
+                - name: enable_metrics
+                  value: false
+                - name: datapoint_condition
+                  value: "true"
+                - name: metric_resource_attributes
+                  value: []
+                - name: metric_attributes
+                  value: []
+                - name: enable_traces
+                  value: false
+                - name: span_condition
+                  value: "true"
+                - name: trace_resource_attributes
+                  value: []
+                - name: trace_attributes
+                  value: []
+    destinations:
+        - id: 01H4PJADZ2HKXVDP6JH50WQF0A
+          name: Splunk:8
+        - id: 01H57QF5D2VKV2Q179DK93BQ6C
+          name: Google:10
+    selector:
+        matchLabels:
+            configuration: splunk
+status:
+    currentVersion: 6
+    latest: true

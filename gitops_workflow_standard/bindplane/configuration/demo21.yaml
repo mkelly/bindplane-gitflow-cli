@@ -1,0 +1,78 @@
+apiVersion: bindplane.observiq.com/v1
+kind: Configuration
+metadata:
+    id: demo21
+    name: demo21
+    labels:
+        platform: linux
+    hash: 5e7dfa163d4b11442013ceb05482d1ba32f855aa2981f561e69d50a45b1ffed7
+    version: 2
+    dateModified: 2023-10-16T18:43:39.326854936Z
+spec:
+    contentType: ""
+    measurementInterval: ""
+    sources:
+        - id: 01HCDN0MEW5MH7489R796QGQK0
+          type: otlp:11
+          parameters:
+            - name: listen_address
+              value: 0.0.0.0
+            - name: grpc_port
+              value: 4317
+            - name: http_port
+              value: 4318
+            - name: enable_tls
+              value: false
+            - name: cert_file
+              value: ""
+            - name: key_file
+              value: ""
+            - name: mutual_tls
+              value: false
+            - name: ca_file
+              value: ""
+            - name: enable_grpc_timeout
+              value: true
+            - name: grpc_max_connection_idle
+              value: 60
+            - name: grpc_max_connection_age
+              value: 60
+            - name: grpc_max_connection_age_grace
+              value: 300
+          processors:
+            - id: 01HCWD2YRNYSTZQBCKDS6ZB1GY
+              type: filter_severity:4
+              parameters:
+                - name: severity
+                  value: WARN
+    destinations:
+        - id: 01HCDN0MEYNPDEH17JRZ9PBNXN
+          name: Elastic:3
+        - id: 01HCEBR5QST9353QJ01GG8ESKD
+          name: logging:3
+    selector:
+        matchLabels:
+            configuration: demo21
+status:
+    rollout:
+        name: ""
+        status: 4
+        options:
+            startAutomatically: false
+            rollbackOnFailure: true
+            phaseAgentCount:
+                initial: 1
+                multiplier: 1
+                maximum: 1
+            maxErrors: 0
+        phase: 3
+        progress:
+            completed: 0
+            errors: 0
+            pending: 0
+            waiting: 0
+    currentVersion: 2
+    pendingVersion: 2
+    latest: true
+    pending: true
+    current: true

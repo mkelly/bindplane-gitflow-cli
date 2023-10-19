@@ -1,0 +1,93 @@
+apiVersion: bindplane.observiq.com/v1
+kind: Configuration
+metadata:
+    id: af6e1d13-1480-45e6-afa9-166c90825726
+    name: fluent-template
+    description: Aggregator configuration for receiving logs from Fluentbit and Fluentd systems using the Fluent protocol.
+    labels:
+        platform: linux
+    hash: 9d5c688f9351f85de05ee237ef625357ca1a6441b1148dc8c86468e81355c094
+    version: 1
+    dateModified: 2023-09-27T13:42:24.725957739Z
+spec:
+    contentType: ""
+    measurementInterval: ""
+    sources:
+        - id: 01H57Y7K906NNRF89FZW5MC9B4
+          displayName: Receive from fluentbit endpoints.
+          type: fluentforward:2
+          parameters:
+            - name: listen_address
+              value: 0.0.0.0
+            - name: port
+              value: 24224
+          processors:
+            - id: 01H57Y7K94VXP7EMTVQBEDVR2R
+              type: count_telemetry:6
+              parameters:
+                - name: enable_logs
+                  value: true
+                - name: log_match
+                  value: "true"
+                - name: log_metric_name
+                  value: fluent.log.count
+                - name: log_metric_units
+                  value: '{logs}'
+                - name: log_enable_attributes
+                  value: false
+                - name: enable_metrics
+                  value: false
+                - name: datapoint_match
+                  value: "true"
+                - name: datapoint_metric_name
+                  value: datapoint.count
+                - name: datapoint_metric_units
+                  value: '{datapoints}'
+                - name: datapoint_enable_attributes
+                  value: false
+                - name: enable_traces
+                  value: false
+                - name: span_match
+                  value: "true"
+                - name: span_metric_name
+                  value: span.count
+                - name: span_metric_units
+                  value: '{spans}'
+                - name: span_enable_attributes
+                  value: false
+                - name: interval
+                  value: 60
+            - id: 01H57Y7K97B0JV65TCZDFFXKGX
+              type: add_fields:8
+              parameters:
+                - name: enable_logs
+                  value: true
+                - name: log_resource_attributes
+                  value:
+                    aggregator-zone: us-east1-a
+                - name: log_resource_action
+                  value: upsert
+                - name: log_attributes_action
+                  value: upsert
+                - name: log_body_action
+                  value: upsert
+                - name: enable_metrics
+                  value: false
+                - name: metric_resource_action
+                  value: upsert
+                - name: metric_attributes_action
+                  value: upsert
+                - name: enable_traces
+                  value: false
+                - name: traces_resource_action
+                  value: upsert
+                - name: traces_attributes_action
+                  value: upsert
+    destinations:
+        - id: 01H57Y7K9FQTH4ETPGF3YA9FGX
+          name: Datadog:2
+    selector:
+        matchLabels:
+            configuration: fluent-template
+status:
+    latest: true

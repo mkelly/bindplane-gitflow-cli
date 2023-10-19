@@ -1,0 +1,20 @@
+apiVersion: bindplane.observiq.com/v1
+kind: Destination
+metadata:
+    id: logging
+    name: logging
+    hash: 6e16e8f166f314bcaba8dc6595e2f42c180db97c480d073ee26e1c116ae74830
+    version: 3
+    dateModified: 2023-09-20T17:16:07.515038979Z
+spec:
+    type: custom:4
+    parameters:
+        - name: telemetry_types
+          value:
+            - Metrics
+            - Logs
+            - Traces
+        - name: configuration
+          value: 'logging:'
+status:
+    latest: true

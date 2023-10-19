@@ -1,0 +1,174 @@
+apiVersion: bindplane.observiq.com/v1
+kind: Configuration
+metadata:
+    id: 8805a6db-83d4-40be-9f4c-fc6327067e56
+    name: iis
+    description: Metrics and logs for IIS app servers.
+    labels:
+        platform: windows
+    hash: 4dc46ce163bf38838d9f05f875fb2dbbb13c0102b9c97bd94539872a068d616c
+    version: 21
+    dateModified: 2023-10-18T15:26:00.095163877Z
+spec:
+    contentType: ""
+    measurementInterval: ""
+    sources:
+        - id: 01H4PJADWXBG1MPXGE59Y8KZ8W
+          type: host:3
+          parameters:
+            - name: metric_filtering
+              value:
+                - system.network.connections
+                - system.network.conntrack.count
+                - system.network.conntrack.max
+                - system.network.dropped
+                - system.network.errors
+                - system.network.io
+                - system.network.packets
+                - system.disk.io
+                - system.disk.io_time
+                - system.disk.merged
+                - system.disk.operation_time
+                - system.disk.operations
+                - system.disk.pending_operations
+                - system.disk.weighted_io_time
+                - system.processes.count
+                - system.processes.created
+                - system.cpu.utilization
+                - system.cpu.time
+                - system.cpu.load_average.5m
+            - name: enable_process
+              value: false
+            - name: process_metrics_filtering
+              value:
+                - process.context_switches
+                - process.cpu.time
+                - process.cpu.utilization
+                - process.disk.io
+                - process.disk.operations
+                - process.memory.usage
+                - process.memory.utilization
+                - process.memory.virtual
+                - process.open_file_descriptors
+                - process.paging.faults
+                - process.signals_pending
+                - process.threads
+            - name: enable_process_filter
+              value: false
+            - name: process_include
+              value: []
+            - name: process_exclude
+              value: []
+            - name: process_filter_match_strategy
+              value: regexp
+            - name: collection_interval
+              value: 60
+        - id: 01H4PJADX0BW6PBXMX20701PHF
+          type: iis:2
+          parameters:
+            - name: enable_metrics
+              value: true
+            - name: collection_interval
+              value: 60
+            - name: disable_metrics
+              value: []
+            - name: enable_logs
+              value: true
+            - name: file_path
+              value:
+                - C:/inetpub/logs/LogFiles/W3SVC*/**/*.log
+            - name: exclude_file_log_path
+              value: []
+            - name: timezone
+              value: UTC
+            - name: parse_to
+              value: body
+          processors:
+            - id: 01HD1P4BT47W6027ERY0PFNN5B
+              type: filter_severity:4
+              parameters:
+                - name: severity
+                  value: WARN
+        - id: 01H4PJADXBZDH3G1Q9X07ZJDYC
+          type: windowsevents:6
+          parameters:
+            - name: system_event_input
+              value: true
+            - name: app_event_input
+              value: true
+            - name: security_event_input
+              value: true
+            - name: custom_channels
+              value: []
+          processors:
+            - id: 01HD1P5KDJFX98FAHDNAJWGJ6T
+              type: log_dedup:5
+              parameters:
+                - name: interval
+                  value: 10
+                - name: log_count_attribute
+                  value: log_count
+                - name: exclude_fields
+                  value: []
+                - name: timezone
+                  value: UTC
+            - id: 01HD1P5KDMWFPR00ZDPA2G8031
+              type: mask_sensitive_data:6
+              parameters:
+                - name: default_rules
+                  value:
+                    - Credit Card
+                    - Date of Birth
+                    - Email
+                    - International Bank Account Number (IBAN)
+                    - IPv4 Address
+                    - IPv6 Address
+                    - MAC Address
+                    - Phone Number
+                    - Social Security Number (SSN)
+                    - US City, State
+                    - US Street Address
+                    - US Zipcode
+                    - UUID/GUID
+                - name: telemetry_types
+                  value:
+                    - Logs
+                - name: exclude_resource_keys
+                  value: []
+                - name: exclude_attribute_keys
+                  value: []
+                - name: exclude_body_keys
+                  value: []
+                - name: custom_rules
+                  value: {}
+    destinations:
+        - id: 01H5AGC9TAMGKB99KJ89Q82JG2
+          name: Google:10
+        - id: 01HCWXA6Z3A354XPKGQ85H4XE2
+          name: Elastic:3
+    selector:
+        matchLabels:
+            configuration: iis
+status:
+    rollout:
+        name: ""
+        status: 4
+        options:
+            startAutomatically: false
+            rollbackOnFailure: true
+            phaseAgentCount:
+                initial: 1
+                multiplier: 1
+                maximum: 1
+            maxErrors: 0
+        phase: 2
+        progress:
+            completed: 2
+            errors: 0
+            pending: 0
+            waiting: 0
+    currentVersion: 21
+    pendingVersion: 21
+    latest: true
+    pending: true
+    current: true

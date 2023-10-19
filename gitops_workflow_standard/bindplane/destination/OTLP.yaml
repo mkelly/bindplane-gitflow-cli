@@ -1,0 +1,57 @@
+apiVersion: bindplane.observiq.com/v1
+kind: Destination
+metadata:
+    id: OTLP
+    name: OTLP
+    hash: 31a64e71426ee86fac7a9671df4bd659579a86566011b7c8223d9784b6017c6c
+    version: 2
+    dateModified: 2023-09-20T17:16:07.578829235Z
+spec:
+    type: otlp_grpc:11
+    parameters:
+        - name: hostname
+          value: otel.corp.localnet
+        - name: grpc_port
+          value: 4317
+        - name: http_port
+          value: 4318
+        - name: protocol
+          value: grpc
+        - name: headers
+          value: {}
+        - name: http_compression
+          value: gzip
+        - name: grpc_compression
+          value: gzip
+        - name: enable_tls
+          value: false
+        - name: insecure_skip_verify
+          value: false
+        - name: ca_file
+          value: ""
+        - name: mutual_tls
+          value: false
+        - name: cert_file
+          value: ""
+        - name: key_file
+          value: ""
+        - name: retry_on_failure_enabled
+          value: true
+        - name: retry_on_failure_initial_interval
+          value: 5
+        - name: retry_on_failure_max_interval
+          value: 30
+        - name: retry_on_failure_max_elapsed_time
+          value: 300
+        - name: sending_queue_enabled
+          value: true
+        - name: sending_queue_num_consumers
+          value: 10
+        - name: sending_queue_queue_size
+          value: 5000
+        - name: persistent_queue_enabled
+          value: true
+        - name: persistent_queue_directory
+          value: $OIQ_OTEL_COLLECTOR_HOME/storage
+status:
+    latest: true

@@ -1,0 +1,166 @@
+apiVersion: bindplane.observiq.com/v1
+kind: Configuration
+metadata:
+    id: sales-endpoint
+    name: sales-endpoint
+    description: Point of sale endpoint syslog and host metrics.
+    labels:
+        platform: linux
+    hash: 6cc76b44f6cee82978557aabca89b86a96d6c715b51b640336f5ee624a98d3b4
+    version: 4
+    dateModified: 2023-10-18T15:59:18.886246255Z
+spec:
+    contentType: ""
+    measurementInterval: ""
+    sources:
+        - id: 01H57RC284YV4ZATJ63FMZNFKC
+          type: host:3
+          parameters:
+            - name: metric_filtering
+              value:
+                - system.disk.io
+                - system.disk.io_time
+                - system.disk.merged
+                - system.disk.operation_time
+                - system.disk.operations
+                - system.disk.pending_operations
+                - system.disk.weighted_io_time
+                - system.processes.count
+                - system.processes.created
+                - system.cpu.time
+                - system.cpu.utilization
+            - name: enable_process
+              value: true
+            - name: process_metrics_filtering
+              value:
+                - process.context_switches
+                - process.cpu.utilization
+                - process.disk.operations
+                - process.memory.utilization
+                - process.open_file_descriptors
+                - process.paging.faults
+                - process.signals_pending
+                - process.threads
+            - name: enable_process_filter
+              value: false
+            - name: process_include
+              value: []
+            - name: process_exclude
+              value: []
+            - name: process_filter_match_strategy
+              value: regexp
+            - name: collection_interval
+              value: 60
+          processors:
+            - id: 01H57WXN1BCSPR86HN9BW36ND7
+              type: batch:3
+              parameters:
+                - name: send_batch_size
+                  value: 8192
+                - name: send_batch_max_size
+                  value: 0
+                - name: timeout
+                  value: 200ms
+        - id: 01H57RC286BDB3YRVWPS68P2XZ
+          type: syslog:2
+          parameters:
+            - name: listen_ip
+              value: 0.0.0.0
+            - name: listen_port
+              value: 5140
+            - name: protocol
+              value: rfc3164
+            - name: connection_type
+              value: udp
+            - name: data_flow
+              value: high
+            - name: timezone
+              value: UTC
+            - name: parse_to
+              value: body
+            - name: enable_octet_counting
+              value: false
+            - name: enable_non_transparent_framing_trailer
+              value: false
+            - name: non_transparent_framing_trailer
+              value: LF
+            - name: enable_mutual_tls
+              value: false
+            - name: cert_file
+              value: ""
+            - name: key_file
+              value: ""
+            - name: ca_file
+              value: ""
+            - name: tls_min_version
+              value: "1.2"
+          processors:
+            - id: 01H57RG3FNMRQSB36XR7J2ZZ0J
+              type: delete_fields:7
+              parameters:
+                - name: enable_logs
+                  value: true
+                - name: log_condition
+                  value: "true"
+                - name: log_resource_attributes
+                  value:
+                    - host.id
+                - name: log_attributes
+                  value: []
+                - name: log_body_keys
+                  value:
+                    - proc_id
+                - name: enable_metrics
+                  value: false
+                - name: datapoint_condition
+                  value: "true"
+                - name: metric_resource_attributes
+                  value: []
+                - name: metric_attributes
+                  value: []
+                - name: enable_traces
+                  value: false
+                - name: span_condition
+                  value: "true"
+                - name: trace_resource_attributes
+                  value: []
+                - name: trace_attributes
+                  value: []
+            - id: 01H57RG3FQ222Z0BC5TV4R0PNQ
+              type: batch:3
+              parameters:
+                - name: send_batch_size
+                  value: 200
+                - name: send_batch_max_size
+                  value: 200
+                - name: timeout
+                  value: 200ms
+    destinations:
+        - id: 01H57RC289G803SA426JC2R678
+          name: Grafana:4
+    selector:
+        matchLabels:
+            configuration: sales-endpoint
+status:
+    rollout:
+        name: ""
+        status: 4
+        options:
+            startAutomatically: false
+            rollbackOnFailure: true
+            phaseAgentCount:
+                initial: 1
+                multiplier: 3
+                maximum: 100
+            maxErrors: 0
+        phase: 4
+        progress:
+            completed: 25
+            errors: 0
+            pending: 0
+            waiting: 0
+    currentVersion: 4
+    pendingVersion: 4
+    latest: true
+    pending: true
+    current: true

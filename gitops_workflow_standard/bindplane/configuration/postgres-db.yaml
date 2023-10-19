@@ -1,0 +1,131 @@
+apiVersion: bindplane.observiq.com/v1
+kind: Configuration
+metadata:
+    id: postgres-db
+    name: postgres-db
+    labels:
+        platform: linux
+    hash: 4e41af0ceec96b5d20414777195a471eea37076e7d2c684fe9a78a98a6c4cd41
+    version: 6
+    dateModified: 2023-10-09T19:07:10.916443068Z
+spec:
+    contentType: ""
+    measurementInterval: ""
+    sources:
+        - id: 01H9RJPYA0H882W34WYJX6QQ4H
+          type: postgresql:10
+          parameters:
+            - name: enable_metrics
+              value: false
+            - name: endpoint
+              value: localhost:5432
+            - name: transport
+              value: tcp
+            - name: username
+              value: ""
+            - name: password
+              value: (sensitive)
+              sensitive: true
+            - name: databases
+              value: []
+            - name: collection_interval
+              value: 60
+            - name: enable_tls
+              value: false
+            - name: ca_file
+              value: ""
+            - name: cert_file
+              value: ""
+            - name: key_file
+              value: ""
+            - name: insecure_skip_verify
+              value: false
+            - name: disable_metrics
+              value: []
+            - name: enable_logs
+              value: true
+            - name: postgresql_log_path
+              value:
+                - /var/log/postgresql/postgresql*.log
+                - /var/lib/pgsql/data/log/postgresql*.log
+                - /var/lib/pgsql/*/data/log/postgresql*.log
+            - name: start_at
+              value: end
+          processors:
+            - id: 01HBBXWT948JXSMWR9TPDRZGZG
+              type: delete_empty_values:5
+              parameters:
+                - name: telemetry_types
+                  value:
+                    - Logs
+                - name: deleted_values
+                  value:
+                    - Null Values
+                - name: exclude_resource_keys
+                  value: []
+                - name: exclude_attribute_keys
+                  value: []
+                - name: exclude_body_keys
+                  value: []
+                - name: empty_string_values
+                  value: []
+            - id: 01HBBXWT98CV50AN4YBVM2XVTQ
+              type: filter_severity:4
+              parameters:
+                - name: severity
+                  value: WARN
+        - id: 01H9RJPYA389M94VM2YHBGQNXZ
+          type: host:3
+          parameters:
+            - name: metric_filtering
+              value:
+                - system.network.connections
+                - system.network.conntrack.count
+                - system.network.conntrack.max
+                - system.network.dropped
+                - system.network.errors
+                - system.network.io
+                - system.network.packets
+                - system.disk.io
+                - system.disk.io_time
+                - system.disk.merged
+                - system.disk.operation_time
+                - system.disk.operations
+                - system.disk.pending_operations
+                - system.disk.weighted_io_time
+                - system.processes.count
+                - system.processes.created
+                - system.cpu.time
+                - system.cpu.utilization
+            - name: enable_process
+              value: true
+            - name: process_metrics_filtering
+              value:
+                - process.context_switches
+                - process.cpu.utilization
+                - process.disk.operations
+                - process.memory.utilization
+                - process.open_file_descriptors
+                - process.paging.faults
+                - process.signals_pending
+                - process.threads
+                - process.handles
+            - name: enable_process_filter
+              value: false
+            - name: process_include
+              value: []
+            - name: process_exclude
+              value: []
+            - name: process_filter_match_strategy
+              value: regexp
+            - name: collection_interval
+              value: 60
+    destinations:
+        - id: 01H9RJPYA631JRF33M0DD87TAF
+          name: Google:10
+    selector:
+        matchLabels:
+            configuration: postgres-db
+status:
+    currentVersion: 5
+    latest: true

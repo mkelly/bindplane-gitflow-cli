@@ -5,7 +5,7 @@ SOURCE_DIR="source"
 OUTPUT_DIR="bindplane"
 
 # Array of commands to automatically execute
-declare -a commands=("configuration" "account" "destination" "user")
+declare -a commands=("configuration" "destination")
 
 for command in "${commands[@]}"; do
   # Create a directory for each command's output

@@ -1,0 +1,200 @@
+apiVersion: bindplane.observiq.com/v1
+kind: Configuration
+metadata:
+    id: dbd89a4a-1ce6-409f-bbfa-bc4ab8c81e17
+    name: iis-template
+    description: Metrics and logs for IIS app servers.
+    labels:
+        platform: windows
+    hash: 1e813d97a98324827d0a56d6bbb3429cc5d04472b03bd7fffcfa3bee8085ef25
+    version: 1
+    dateModified: 2023-10-09T19:07:10.850593407Z
+spec:
+    contentType: ""
+    measurementInterval: ""
+    sources:
+        - id: 01H4PJADWXBG1MPXGE59Y8KZ8W
+          type: host:3
+          parameters:
+            - name: metric_filtering
+              value:
+                - system.network.connections
+                - system.network.conntrack.count
+                - system.network.conntrack.max
+                - system.network.dropped
+                - system.network.errors
+                - system.network.io
+                - system.network.packets
+                - system.disk.io
+                - system.disk.io_time
+                - system.disk.merged
+                - system.disk.operation_time
+                - system.disk.operations
+                - system.disk.pending_operations
+                - system.disk.weighted_io_time
+                - system.processes.count
+                - system.processes.created
+                - system.cpu.utilization
+                - system.cpu.time
+                - system.cpu.load_average.5m
+            - name: enable_process
+              value: false
+            - name: process_metrics_filtering
+              value:
+                - process.context_switches
+                - process.cpu.time
+                - process.cpu.utilization
+                - process.disk.io
+                - process.disk.operations
+                - process.memory.usage
+                - process.memory.utilization
+                - process.memory.virtual
+                - process.open_file_descriptors
+                - process.paging.faults
+                - process.signals_pending
+                - process.threads
+            - name: enable_process_filter
+              value: false
+            - name: process_include
+              value: []
+            - name: process_exclude
+              value: []
+            - name: process_filter_match_strategy
+              value: regexp
+            - name: collection_interval
+              value: 60
+        - id: 01H4PJADX0BW6PBXMX20701PHF
+          type: iis:2
+          parameters:
+            - name: enable_metrics
+              value: true
+            - name: collection_interval
+              value: 60
+            - name: disable_metrics
+              value: []
+            - name: enable_logs
+              value: true
+            - name: file_path
+              value:
+                - C:/inetpub/logs/LogFiles/W3SVC*/**/*.log
+            - name: exclude_file_log_path
+              value: []
+            - name: timezone
+              value: UTC
+            - name: parse_to
+              value: body
+          processors:
+            - id: 01H4PJADQSMNT0ZNGSZVK2HSQ4
+              type: log_dedup:5
+              parameters:
+                - name: interval
+                  value: 1
+                - name: log_count_attribute
+                  value: log_count
+                - name: exclude_fields
+                  value: []
+                - name: timezone
+                  value: UTC
+            - id: 01H4PJADQVD4KYY0HB112Y0KW4
+              type: delete_empty_values:5
+              parameters:
+                - name: telemetry_types
+                  value:
+                    - Logs
+                - name: deleted_values
+                  value:
+                    - Null Values
+                - name: exclude_resource_keys
+                  value: []
+                - name: exclude_attribute_keys
+                  value: []
+                - name: exclude_body_keys
+                  value: []
+                - name: empty_string_values
+                  value:
+                    - '-'
+            - id: 01H4PJADQZ49B5DZVF6SWFP15S
+              type: delete_fields:7
+              parameters:
+                - name: enable_logs
+                  value: true
+                - name: log_condition
+                  value: "true"
+                - name: log_resource_attributes
+                  value:
+                    - host.id
+                - name: log_attributes
+                  value: []
+                - name: log_body_keys
+                  value:
+                    - s-port
+                    - s-ip
+                - name: enable_metrics
+                  value: false
+                - name: datapoint_condition
+                  value: "true"
+                - name: metric_resource_attributes
+                  value: []
+                - name: metric_attributes
+                  value: []
+                - name: enable_traces
+                  value: false
+                - name: span_condition
+                  value: "true"
+                - name: trace_resource_attributes
+                  value: []
+                - name: trace_attributes
+                  value: []
+        - id: 01H4PJADXBZDH3G1Q9X07ZJDYC
+          type: windowsevents:6
+          parameters:
+            - name: system_event_input
+              value: true
+            - name: app_event_input
+              value: true
+            - name: security_event_input
+              value: true
+            - name: custom_channels
+              value: []
+          processors:
+            - id: 01H4PJADRDP24RK7DRQ71WWHND
+              type: delete_fields:7
+              parameters:
+                - name: enable_logs
+                  value: true
+                - name: log_condition
+                  value: "true"
+                - name: log_resource_attributes
+                  value:
+                    - host.id
+                - name: log_attributes
+                  value: []
+                - name: log_body_keys
+                  value:
+                    - keywords
+                    - system_time
+                    - task
+                - name: enable_metrics
+                  value: false
+                - name: datapoint_condition
+                  value: "true"
+                - name: metric_resource_attributes
+                  value: []
+                - name: metric_attributes
+                  value: []
+                - name: enable_traces
+                  value: false
+                - name: span_condition
+                  value: "true"
+                - name: trace_resource_attributes
+                  value: []
+                - name: trace_attributes
+                  value: []
+    destinations:
+        - id: 01H5AGC9TAMGKB99KJ89Q82JG2
+          name: Google:10
+    selector:
+        matchLabels:
+            configuration: iis-template
+status:
+    latest: true

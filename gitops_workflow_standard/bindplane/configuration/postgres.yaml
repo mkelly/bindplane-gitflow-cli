@@ -1,0 +1,107 @@
+apiVersion: bindplane.observiq.com/v1
+kind: Configuration
+metadata:
+    id: postgres
+    name: postgres
+    description: Backend database (postgres) metrics and logs.
+    labels:
+        platform: linux
+    hash: c50caa2c2e38beab968963a46f44ae662c3589fa813d6fe18076ab0a743231d7
+    version: 8
+    dateModified: 2023-10-09T14:35:08.142753077Z
+spec:
+    contentType: ""
+    measurementInterval: ""
+    sources:
+        - id: 01H4PJADWWSZZVFKPGC2NZJVB2
+          type: postgresql:10
+          parameters:
+            - name: enable_metrics
+              value: true
+            - name: endpoint
+              value: localhost:5432
+            - name: transport
+              value: tcp
+            - name: username
+              value: otel
+            - name: password
+              value: (sensitive)
+              sensitive: true
+            - name: databases
+              value: []
+            - name: collection_interval
+              value: 60
+            - name: enable_tls
+              value: false
+            - name: ca_file
+              value: ""
+            - name: cert_file
+              value: ""
+            - name: key_file
+              value: ""
+            - name: insecure_skip_verify
+              value: false
+            - name: disable_metrics
+              value: []
+            - name: enable_logs
+              value: true
+            - name: postgresql_log_path
+              value:
+                - /var/lib/pgsql/14/data/log/postgresql.log
+            - name: start_at
+              value: end
+          processors:
+            - id: 01H64AHDVB0ANN2M1EEEE3S99S
+              type: filter_severity:4
+              parameters:
+                - name: severity
+                  value: WARN
+            - id: 01H7DNHN9RETA0FJ498DJRYM1W
+              type: batch:3
+              parameters:
+                - name: send_batch_size
+                  value: 200
+                - name: send_batch_max_size
+                  value: 400
+                - name: timeout
+                  value: 1s
+    destinations:
+        - id: 01H4PJADX2M2NKGR9SCHNHXDJG
+          name: s3-archive:2
+          processors:
+            - id: 01H57R73PRRSENA41E6120TS9T
+              type: batch:3
+              parameters:
+                - name: send_batch_size
+                  value: 500
+                - name: send_batch_max_size
+                  value: 600
+                - name: timeout
+                  value: 2s
+        - id: 01H4PJADX7JA3ZMXQT4835PZZA
+          name: Splunk:8
+          processors:
+            - id: 01H4PJADQC8RR3049RF1XA4Q8Y
+              displayName: Filter query log
+              type: filter_field:6
+              parameters:
+                - name: telemetry_types
+                  value:
+                    - Logs
+                - name: action
+                  value: exclude
+                - name: match_type
+                  value: strict
+                - name: resources
+                  value: {}
+                - name: attributes
+                  value:
+                    log_type: postgresql.slow_query
+                - name: bodies
+                  value: {}
+    selector:
+        matchLabels:
+            configuration: postgres
+status:
+    currentVersion: 7
+    latest: true

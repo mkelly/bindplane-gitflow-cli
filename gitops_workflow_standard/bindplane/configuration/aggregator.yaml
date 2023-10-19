@@ -1,0 +1,70 @@
+apiVersion: bindplane.observiq.com/v1
+kind: Configuration
+metadata:
+    id: aggregator
+    name: aggregator
+    labels:
+        platform: linux
+    hash: 16ead3aed8b34837e204536341d08039a74cca43c3ed481b3b18d783971f1934
+    version: 2
+    dateModified: 2023-10-16T18:57:00.491948316Z
+spec:
+    contentType: ""
+    measurementInterval: ""
+    sources:
+        - id: 01HC0RKHTN4PJY1NE059Z1QP1M
+          type: otlp:11
+          parameters:
+            - name: listen_address
+              value: 0.0.0.0
+            - name: grpc_port
+              value: 4317
+            - name: http_port
+              value: 4318
+            - name: enable_tls
+              value: false
+            - name: cert_file
+              value: ""
+            - name: key_file
+              value: ""
+            - name: mutual_tls
+              value: false
+            - name: ca_file
+              value: ""
+            - name: enable_grpc_timeout
+              value: true
+            - name: grpc_max_connection_idle
+              value: 60
+            - name: grpc_max_connection_age
+              value: 60
+            - name: grpc_max_connection_age_grace
+              value: 300
+    destinations:
+        - id: 01HC0RKHTQGTJE1VFSP1W5XNC8
+          name: s3-archive:2
+    selector:
+        matchLabels:
+            configuration: aggregator
+status:
+    rollout:
+        name: ""
+        status: 4
+        options:
+            startAutomatically: false
+            rollbackOnFailure: true
+            phaseAgentCount:
+                initial: 1
+                multiplier: 1
+                maximum: 1
+            maxErrors: 0
+        phase: 0
+        progress:
+            completed: 0
+            errors: 0
+            pending: 0
+            waiting: 0
+    currentVersion: 2
+    pendingVersion: 2
+    latest: true
+    pending: true
+    current: true
