@@ -19,7 +19,7 @@ jobs:
 
       - name: Install BindPlane CLI
         run: |
-          curl -o bindplane.zip https://storage.googleapis.com/bindplane-op-releases/bindplane/bindplane-ee-v1.30.0-linux-amd64.zip
+          curl -o bindplane.zip https://storage.googleapis.com/bindplane-op-releases/bindplane/latest/bindplane-ee-linux-amd64.zip
           unzip bindplane.zip
           sudo chmod +x bindplane
           sudo mv bindplane /usr/local/bin/bindplane

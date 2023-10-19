@@ -15,7 +15,7 @@ jobs:
           ref: ${{ github.event.pull_request.head.sha }}
       
       - run: rm -rf download
-      
+
       - run: mkdir download
 
       - name: Install BindPlane CLI
