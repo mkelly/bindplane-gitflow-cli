@@ -1,5 +1,5 @@
 # This configuration is managed by BindPlane OP.
-# Configuration: nginx:13
+# Configuration: nginx:15
 receivers:
     nginx/source0_01H4PJADTF6AS2NFXPPAK7CB2R:
         collection_interval: 60s
