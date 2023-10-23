@@ -1,7 +1,5 @@
 #!/bin/bash
 
-# Define the template, source, and output directories
-SOURCE_DIR="source"
 OUTPUT_DIR="bindplane"
 
 # Array of commands to automatically execute
