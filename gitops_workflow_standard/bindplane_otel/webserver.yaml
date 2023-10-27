@@ -1,5 +1,5 @@
 # This configuration is managed by BindPlane OP.
-# Configuration: webserver:5
+# Configuration: webserver:6
 receivers:
     hostmetrics/source1_01HAHRXVCAJ7DP1QS98VGNJD2H:
         collection_interval: 60s

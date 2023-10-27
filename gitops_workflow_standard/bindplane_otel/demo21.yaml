@@ -1,5 +1,5 @@
 # This configuration is managed by BindPlane OP.
-# Configuration: demo21:2
+# Configuration: demo21:3
 receivers:
     otlp/source0_01HCDN0MEW5MH7489R796QGQK0:
         protocols:

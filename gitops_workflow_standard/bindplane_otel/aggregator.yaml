@@ -1,5 +1,5 @@
 # This configuration is managed by BindPlane OP.
-# Configuration: aggregator:2
+# Configuration: aggregator:4
 receivers:
     otlp/source0_01HC0RKHTN4PJY1NE059Z1QP1M:
         protocols:

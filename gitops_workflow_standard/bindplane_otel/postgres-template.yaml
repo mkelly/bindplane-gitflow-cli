@@ -1,5 +1,5 @@
 # This configuration is managed by BindPlane OP.
-# Configuration: postgres-template:1
+# Configuration: postgres-template:2
 receivers:
     plugin/source0_01H4PJADWWSZZVFKPGC2NZJVB2__postgresql:
         parameters:

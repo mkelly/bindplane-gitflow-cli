@@ -1,5 +1,5 @@
 # This configuration is managed by BindPlane OP.
-# Configuration: postgres-db:6
+# Configuration: postgres-db:8
 receivers:
     hostmetrics/source1_01H9RJPYA389M94VM2YHBGQNXZ:
         collection_interval: 60s

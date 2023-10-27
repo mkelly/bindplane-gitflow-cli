@@ -1,0 +1,59 @@
+# This configuration is managed by BindPlane OP.
+# Configuration: teset:1
+receivers:
+    filelog/source0_01HDP7MQVJEKF8XV82Q7QYKKJ9:
+        encoding: utf-8
+        exclude:
+            - \
+        fingerprint_size: 1kb
+        include:
+            - \
+        include_file_name: true
+        include_file_name_resolved: false
+        include_file_path: false
+        include_file_path_resolved: false
+        max_concurrent_files: 1024
+        operators:
+            - field: attributes.log_type
+              type: add
+              value: file
+        poll_interval: 200ms
+        retry_on_failure:
+            enabled: false
+        start_at: end
+        storage: file_storage/source0_01HDP7MQVJEKF8XV82Q7QYKKJ9
+processors:
+    resourcedetection/source0_01HDP7MQVJEKF8XV82Q7QYKKJ9:
+        detectors:
+            - system
+        system:
+            hostname_sources:
+                - os
+exporters:
+    googlecloud/Google:
+        log:
+            compression: gzip
+            resource_filters:
+                - regex: .*
+        metric:
+            compression: gzip
+        project: bindplane-op-demo
+        sending_queue:
+            enabled: false
+extensions:
+    file_storage/source0_01HDP7MQVJEKF8XV82Q7QYKKJ9:
+        compaction:
+            directory: $OIQ_OTEL_COLLECTOR_HOME/storage
+            on_rebound: true
+        directory: $OIQ_OTEL_COLLECTOR_HOME/storage
+service:
+    extensions:
+        - file_storage/source0_01HDP7MQVJEKF8XV82Q7QYKKJ9
+    pipelines:
+        logs/source0_01HDP7MQVJEKF8XV82Q7QYKKJ9__Google-0:
+            receivers:
+                - filelog/source0_01HDP7MQVJEKF8XV82Q7QYKKJ9
+            processors:
+                - resourcedetection/source0_01HDP7MQVJEKF8XV82Q7QYKKJ9
+            exporters:
+                - googlecloud/Google
