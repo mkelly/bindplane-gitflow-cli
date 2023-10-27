@@ -1,8 +1,8 @@
 # This configuration is managed by BindPlane OP.
-# Configuration: iis:28
+# Configuration: iis:29
 receivers:
     hostmetrics/source0_01H4PJADWXBG1MPXGE59Y8KZ8W:
-        collection_interval: 60s
+        collection_interval: 30s
         scrapers:
             filesystem:
                 metrics:
